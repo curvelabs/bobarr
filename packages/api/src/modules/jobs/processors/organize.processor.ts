@@ -317,14 +317,18 @@ export class OrganizeProcessor {
         if (episodeNb) {
           for (const res of results) {
             if (res.episodeNb === parseInt(episodeNb, 10)) {
-                duplicated = true;
+              duplicated = true;
 
-                break;
+              break;
             }
           }
         }
 
-        if (!duplicated && episodeNb && allowedExtensions.includes(ext.replace(/^\./, ''))) {
+        if (
+          !duplicated &&
+          episodeNb &&
+          allowedExtensions.includes(ext.replace(/^\./, ''))
+        ) {
           return [
             ...results,
             {

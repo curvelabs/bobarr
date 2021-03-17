@@ -70,13 +70,18 @@ export function ManualSearchComponent(props: ManualSearchProps) {
 
     if (file && props.media.id) {
       const base64 = await toBase64(file);
+
+      let mediaType = FileType.Movie;
+      if (props.media.__typename === 'TMDBFormattedTVSeason') {
+        mediaType = FileType.Season;
+      } else if (props.media.__typename === 'EnrichedTVEpisode') {
+        mediaType = FileType.Episode;
+      }
+
       await downloadOwnTorrent({
         variables: {
           mediaId: props.media.id,
-          mediaType:
-            props.media.__typename === 'EnrichedTVEpisode'
-              ? FileType.Episode
-              : (props.media.__typename === 'TMDBFormattedTVSeason' ? FileType.Season : FileType.Movie),
+          mediaType,
           torrent: base64,
         },
       });
@@ -98,13 +103,17 @@ export function ManualSearchComponent(props: ManualSearchProps) {
     }
 
     if (props.media.id) {
+      let mediaType = FileType.Movie;
+      if (props.media.__typename === 'TMDBFormattedTVSeason') {
+        mediaType = FileType.Season;
+      } else if (props.media.__typename === 'EnrichedTVEpisode') {
+        mediaType = FileType.Episode;
+      }
+
       await downloadOwnTorrent({
         variables: {
           mediaId: props.media.id,
-          mediaType:
-            props.media.__typename === 'EnrichedTVEpisode'
-              ? FileType.Episode
-              : (props.media.__typename === 'TMDBFormattedTVSeason' ? FileType.Season : FileType.Movie),
+          mediaType,
           torrent: magnetLink,
         },
       });
