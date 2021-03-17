@@ -307,13 +307,24 @@ export class OrganizeProcessor {
         const ext = path.extname(file.name);
         const fileName = path.basename(file.name.toUpperCase());
 
-        const [, episodeNb1] = /S\d+ ?E(\d+)/.exec(fileName) || []; // Foobar_S01E01.mkv
+        const [, episodeNb1] = /S\d+\W?E(\d+)/.exec(fileName) || []; // Foobar_S01E01.mkv
         const [, episodeNb2] = /\d+X(\d+)/.exec(fileName) || []; // Foobar_1x01.mkv
         const episodeNb = episodeNb1 || episodeNb2;
 
         const [, part] = /part ?(\d+)/.exec(fileName.toLowerCase()) || []; // Foobar_S01E01_Part1
 
-        if (episodeNb && allowedExtensions.includes(ext.replace(/^\./, ''))) {
+        let duplicated = false;
+        if (episodeNb) {
+          for (let res of results) {
+            if (res.episodeNb === parseInt(episodeNb, 10)) {
+                duplicated = true;
+
+                break;
+            }
+          }
+        }
+
+        if (!duplicated && episodeNb && allowedExtensions.includes(ext.replace(/^\./, ''))) {
           return [
             ...results,
             {
@@ -336,7 +347,7 @@ export class OrganizeProcessor {
         files: torrent.transmissionTorrent.files,
       });
 
-      throw new Error('could not find any files in torrent');
+      // throw new Error('could not find any files in torrent');
     }
 
     await childCommand(`mkdir -p "${seasonFolder}"`);

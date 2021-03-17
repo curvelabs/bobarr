@@ -76,7 +76,7 @@ export function ManualSearchComponent(props: ManualSearchProps) {
           mediaType:
             props.media.__typename === 'EnrichedTVEpisode'
               ? FileType.Episode
-              : FileType.Movie,
+              : (props.media.__typename === 'TMDBFormattedTVSeason' ? FileType.Season : FileType.Movie),
           torrent: base64,
         },
       });
@@ -104,7 +104,7 @@ export function ManualSearchComponent(props: ManualSearchProps) {
           mediaType:
             props.media.__typename === 'EnrichedTVEpisode'
               ? FileType.Episode
-              : FileType.Movie,
+              : (props.media.__typename === 'TMDBFormattedTVSeason' ? FileType.Season : FileType.Movie),
           torrent: magnetLink,
         },
       });

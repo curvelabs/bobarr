@@ -180,6 +180,10 @@ export class ScanLibraryProcessor {
     { data: { movie } }: Job<{ movie: string }>,
     @TransactionManager() manager?: EntityManager
   ) {
+    if (movie.startsWith('.')) {
+      return;
+    }
+
     this.logger.info('processing movie', { movie });
 
     const movieDAO = manager!.getCustomRepository(MovieDAO);
@@ -215,7 +219,10 @@ export class ScanLibraryProcessor {
     const [, title, year] = /^(.+) \((\d+)/.exec(movie) || [];
 
     if (!title || !year) {
-      throw new Error(`cant parse movie name or year [${movie}]`);
+      this.logger.error('cant parse movie name or year', { movie });
+      // throw new Error(`cant parse movie name or year [${movie}]`);
+
+      return;
     }
 
     this.logger.info('parsed filename', { title, year });
@@ -397,7 +404,9 @@ export class ScanLibraryProcessor {
           season,
           seasonNumber,
         });
-        throw new Error('could not parse season number');
+        // throw new Error('could not parse season number');
+
+        return;
       }
 
       // parse episode number from title
