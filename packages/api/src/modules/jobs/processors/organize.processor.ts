@@ -315,7 +315,7 @@ export class OrganizeProcessor {
 
         let duplicated = false;
         if (episodeNb) {
-          for (let res of results) {
+          for (const res of results) {
             if (res.episodeNb === parseInt(episodeNb, 10)) {
                 duplicated = true;
 
