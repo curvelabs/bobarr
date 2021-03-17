@@ -630,6 +630,19 @@ export class LibraryService {
         }
       });
 
+      const torrent = await torrentDAO.findOne({
+        resourceId: seasonId,
+        resourceType: FileType.SEASON,
+      });
+
+      if (torrent) {
+        await torrentDAO.remove(torrent);
+        await this.transmissionService.removeTorrentAndFiles(
+          torrent.torrentHash
+        );
+        this.logger.info('season torrent removed', { torrent: torrent.id });
+      }
+
       const tvSeasonFolders = uniq(
         flatten(
           tvSeason.episodes.map((episode) =>
