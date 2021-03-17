@@ -37,6 +37,10 @@ export class TransmissionService {
       .then(({ torrents: [torrent] }) => torrent);
   }
 
+  public getTorrents(torrentHashes: string[]) {
+    return this.client.get(torrentHashes);
+  }
+
   @LazyTransaction()
   public async addTorrent(
     {

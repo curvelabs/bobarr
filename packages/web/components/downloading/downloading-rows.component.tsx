@@ -21,7 +21,7 @@ export function DownloadingRowsComponent({
   rows: DownloadingMedia[];
 }) {
   const { data } = useGetTorrentStatusQuery({
-    pollInterval: 2000,
+    pollInterval: 5000,
     variables: {
       torrents: rows.map(({ resourceId, resourceType }) => ({
         resourceId,
