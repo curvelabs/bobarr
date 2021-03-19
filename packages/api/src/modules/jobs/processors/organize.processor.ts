@@ -233,7 +233,7 @@ export class OrganizeProcessor {
       );
 
       await fileDAO.save({
-        episodeId,
+        tvEpisodeId: episodeId,
         path: path.join(seasonFolder, torrentFile.next),
       });
     });
@@ -379,10 +379,20 @@ export class OrganizeProcessor {
       );
 
       if (episode) {
-        await fileDAO.save({
-          episodeId: episode.id,
+        const exisitingFiles = await fileDAO.find({
           path: `${path.join(seasonFolder, newName)}.${file.ext}`,
         });
+
+        const fileData: any = {
+          tvEpisodeId: episode.id,
+          path: `${path.join(seasonFolder, newName)}.${file.ext}`,
+        };
+
+        if (exisitingFiles.length > 0) {
+          fileData.id = exisitingFiles[0].id;
+        }
+
+        await fileDAO.save(fileData);
       }
     });
 
