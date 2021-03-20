@@ -17,6 +17,7 @@ import {
   useDownloadTvEpisodeMutation,
   GetLibraryTvShowsDocument,
   useDownloadSeasonMutation,
+  useDownloadMovieFromResultMutation,
 } from '../../utils/graphql';
 
 import { Media } from './manual-search.helpers';
@@ -176,6 +177,29 @@ function ManualDownloadMedia({
       }),
   });
 
+  const [
+    downloadMovieFromResult,
+    { loading: loading4 },
+  ] = useDownloadMovieFromResultMutation({
+    awaitRefetchQueries: true,
+    refetchQueries: [
+      { query: GetLibraryMoviesDocument },
+      { query: GetDownloadingDocument },
+      { query: GetMissingDocument },
+      ...refetchQueries,
+    ],
+    onError: ({ message }) =>
+      notification.error({
+        message: message.replace('GraphQL error: ', ''),
+        placement: 'bottomRight',
+      }),
+    onCompleted: () =>
+      notification.success({
+        message: 'Download movie started',
+        placement: 'bottomRight',
+      }),
+  });
+
   const handleClick = () => {
     if (media.__typename === 'EnrichedMovie') {
       downloadMovie({
@@ -204,9 +228,18 @@ function ManualDownloadMedia({
         },
       });
     }
+
+    if (media.__typename === 'TMDBSearchResult') {
+      downloadMovieFromResult({
+        variables: {
+          movieTMDBId: media.movieTMDBId!,
+          jackettResult: jackettInput,
+        },
+      });
+    }
   };
 
-  return loading1 || loading2 || loading3 ? (
+  return loading1 || loading2 || loading3 || loading4 ? (
     <LoadingOutlined />
   ) : (
     <DownloadOutlined style={{ cursor: 'pointer' }} onClick={handleClick} />

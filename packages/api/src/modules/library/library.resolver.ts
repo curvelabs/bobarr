@@ -102,12 +102,31 @@ export class LibraryResolver {
   }
 
   @Mutation((_returns) => GraphQLCommonResponse)
+  public async downloadMovieFromResult(
+    @Args('movieTMDBId', { type: () => Int }) movieTMDBId: number,
+    @Args('jackettResult', { type: () => JackettInput })
+    jackettResult: JackettInput
+  ) {
+    await this.libraryService.downloadMovieFromResult(
+      movieTMDBId,
+      jackettResult,
+      null
+    );
+    return { success: true, message: 'MOVIE_DOWNLOAD_STARTED' };
+  }
+
+  @Mutation((_returns) => GraphQLCommonResponse)
   public async downloadSeason(
     @Args('tvShowTMDBId', { type: () => Int }) tvShowTMDBId: number,
     @Args('seasonNumber', { type: () => Int }) seasonNumber: number,
     @Args('jackettResult', { type: () => JackettInput })
     jackettResult: JackettInput
   ) {
+    await this.libraryService.trackTVShowWithoutDownload({
+      tmdbId: tvShowTMDBId,
+      seasonNumbers: [seasonNumber],
+    });
+
     const { seasons } = await this.tvShowDAO
       .createQueryBuilder('tvShow')
       .innerJoinAndSelect(

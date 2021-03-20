@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import cx from 'classnames';
 import dayjs from 'dayjs';
-import { noop } from 'lodash';
+// import { noop } from 'lodash';
 import { Modal } from 'antd';
 import { FaRegWindowClose, FaPlay } from 'react-icons/fa';
 
@@ -49,13 +49,13 @@ export function TVShowSeasonsModalComponent(
     onRequestClose();
   };
 
-  const handleSeasonClick = (seasonNumber: number) => {
-    setSelectedSeasons(
-      selectedSeasons.includes(seasonNumber)
-        ? selectedSeasons.filter((_) => _ !== seasonNumber)
-        : [...selectedSeasons, seasonNumber]
-    );
-  };
+  // const handleSeasonClick = (seasonNumber: number) => {
+  //   setSelectedSeasons(
+  //     selectedSeasons.includes(seasonNumber)
+  //       ? selectedSeasons.filter((_) => _ !== seasonNumber)
+  //       : [...selectedSeasons, seasonNumber]
+  //   );
+  // };
 
   const handleTrack = async () => {
     await trackTVShow({
@@ -70,7 +70,7 @@ export function TVShowSeasonsModalComponent(
   const youtubeSearchURL = `//youtube.com/results?search_query=trailer+season+1+${tvShow.title}+${data?.params?.language}`;
 
   const isDownloadButtonDisabled =
-    selectedSeasons.length === 0 || loading || mutationLoading;
+    (selectedSeasons.length === 0 && inLibrary) || loading || mutationLoading;
   const isDeleteButtonDisabled = !inLibrary || loading || mutationLoading;
 
   return (
@@ -128,46 +128,14 @@ export function TVShowSeasonsModalComponent(
               </div>
               <div className="overview">{tvShow.overview}</div>
               <div className="seasons-details">
-                {seasons
-                  .filter((season) => season.inLibrary)
-                  .map((season) => (
-                    <TVSeasonDetailsComponent
-                      key={season.id}
-                      season={season}
-                      tvShowTMDBId={tvShow.tmdbId}
-                      tvShowTitle={tvShow.title}
-                    />
-                  ))}
-              </div>
-              <div className="buttons">
-                <div className="seasons">
-                  {seasons.map((season) => (
-                    <div
-                      key={season.id}
-                      onClick={
-                        season.inLibrary
-                          ? noop
-                          : () => handleSeasonClick(season.seasonNumber)
-                      }
-                      className={cx('btn season-row', {
-                        selected: selectedSeasons.includes(season.seasonNumber),
-                        'in-library': season.inLibrary,
-                      })}
-                    >
-                      <div>
-                        <div className="season-number">
-                          Season {season.seasonNumber}
-                        </div>
-                        <div className="season-episodes-count">
-                          {season.airDate && (
-                            <>{dayjs(season.airDate).format('YYYY')} | </>
-                          )}
-                          {season.episodeCount} Episodes
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                {seasons.map((season) => (
+                  <TVSeasonDetailsComponent
+                    key={season.id}
+                    season={season}
+                    tvShowTMDBId={tvShow.tmdbId}
+                    tvShowTitle={tvShow.title}
+                  />
+                ))}
               </div>
               <div className="buttons">
                 {inLibrary && (
@@ -209,7 +177,7 @@ export function TVShowSeasonsModalComponent(
                   <div>
                     {selectedSeasons.length > 0
                       ? `Download ${selectedSeasons.length} seasons`
-                      : 'Download'}
+                      : 'Add to library'}
                   </div>
                 </div>
               </div>

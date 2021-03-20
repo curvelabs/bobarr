@@ -111,6 +111,12 @@ export class LibraryService {
     return movie;
   }
 
+  public async trackMovieWithoutDownload(movieAttributes: DeepPartial<Movie>) {
+    this.logger.info('track movie', { tmdbId: movieAttributes.tmdbId });
+    const movie = await this.movieDAO.save(movieAttributes);
+    return movie;
+  }
+
   public async getMovies() {
     const movies = await this.movieDAO.find({ order: { createdAt: 'DESC' } });
     const enrichedMovies = map(movies, this.enrichMovie);
@@ -340,6 +346,40 @@ export class LibraryService {
   }
 
   @LazyTransaction()
+  public async downloadMovieFromResult(
+    movieTMDBId: number,
+    jackettResult: JackettInput,
+    @TransactionManager() manager: EntityManager | null
+  ) {
+    const movieResult = await this.tmdbService.getMovie(movieTMDBId);
+    const movie = await this.trackMovieWithoutDownload({
+      title: movieResult.title,
+      tmdbId: movieTMDBId,
+    });
+
+    await this.replaceMovie(movie.id, manager!);
+
+    const torrent = await this.transmissionService.addTorrent(
+      {
+        torrent: jackettResult.downloadLink,
+        torrentType: 'url',
+        torrentAttributes: {
+          resourceType: FileType.MOVIE,
+          resourceId: movie.id,
+          quality: jackettResult.quality,
+          tag: jackettResult.tag,
+        },
+      },
+      manager
+    );
+
+    this.logger.info('download movie started', {
+      movieId: movie.id,
+      torrent: torrent.id,
+    });
+  }
+
+  @LazyTransaction()
   public async downloadTVSeason(
     seasonId: number,
     jackettResult: JackettInput,
@@ -419,6 +459,23 @@ export class LibraryService {
     await forEachSeries(missingSeasons, (season) =>
       this.jobsService.startDownloadSeason(season.id)
     );
+
+    return tvShow;
+  }
+
+  public async trackTVShowWithoutDownload({
+    tmdbId,
+    seasonNumbers,
+  }: {
+    tmdbId: number;
+    seasonNumbers: number[];
+  }) {
+    this.logger.info('track tv show', { tmdbId });
+
+    const { tvShow } = await this.trackMissingSeasons({
+      tmdbId,
+      seasonNumbers,
+    });
 
     return tvShow;
   }

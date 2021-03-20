@@ -6,7 +6,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 
 import {
   DownloadingMedia,
-  useGetTorrentStatusQuery,
+  useGetMultiTorrentStatusQuery,
   FileType,
   TorrentStatus,
 } from '../../utils/graphql';
@@ -20,7 +20,7 @@ export function DownloadingRowsComponent({
 }: {
   rows: DownloadingMedia[];
 }) {
-  const { data } = useGetTorrentStatusQuery({
+  const { data } = useGetMultiTorrentStatusQuery({
     pollInterval: 5000,
     variables: {
       torrents: rows.map(({ resourceId, resourceType }) => ({

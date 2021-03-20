@@ -396,7 +396,7 @@ export class ScanLibraryProcessor {
         return;
       }
 
-      const season = path.dirname(episodePath);
+      const season = path.basename(path.dirname(episodePath));
       const [seasonNumber] = /\d+/.exec(season) || [];
 
       if (!seasonNumber) {
@@ -410,7 +410,18 @@ export class ScanLibraryProcessor {
       }
 
       // parse episode number from title
-      const [, episodeNumber] = /E(\d+)/.exec(episodePath) || [];
+      const [, episodeNumber] =
+        /E(\d+)/.exec(path.basename(episodePath).toUpperCase()) || [];
+
+      if (!episodeNumber) {
+        this.logger.error('could not parse episode number', {
+          episode: path.basename(episodePath),
+          episodeNumber,
+        });
+        // throw new Error('could not parse season number');
+
+        return;
+      }
 
       this.logger.info(`found season number and episode`, {
         seasonNumber,
