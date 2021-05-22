@@ -49,10 +49,7 @@ export function TVSeasonDetailsComponent({
     },
     {
       title: 'Air date',
-      render: (row: EnrichedTvEpisode) =>
-        row.releaseDate !== '1901-01-01'
-          ? availableIn(dayjs(row.releaseDate))
-          : 'Unknown',
+      render: (row: EnrichedTvEpisode) => availableIn(dayjs(row.releaseDate)),
     },
     {
       title: 'Status',
