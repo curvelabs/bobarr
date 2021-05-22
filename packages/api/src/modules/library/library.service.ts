@@ -814,7 +814,7 @@ export class LibraryService {
     } catch (e) {
       return {
         ...tvEpisode,
-        releaseDate: null,
+        releaseDate: '1901-01-01',
       };
     }
   };
