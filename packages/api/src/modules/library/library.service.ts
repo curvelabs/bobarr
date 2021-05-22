@@ -800,15 +800,22 @@ export class LibraryService {
   };
 
   private enrichTVEpisode = async (tvEpisode: TVEpisode) => {
-    const tmdbResult = await this.tmdbService.getTVEpisode(
-      tvEpisode.tvShow.tmdbId,
-      tvEpisode.seasonNumber,
-      tvEpisode.episodeNumber
-    );
+    try {
+      const tmdbResult = await this.tmdbService.getTVEpisode(
+        tvEpisode.tvShow.tmdbId,
+        tvEpisode.seasonNumber,
+        tvEpisode.episodeNumber
+      );
 
-    return {
-      ...tvEpisode,
-      releaseDate: tmdbResult.air_date,
-    };
+      return {
+        ...tvEpisode,
+        releaseDate: tmdbResult.air_date,
+      };
+    } catch (e) {
+      return {
+        ...tvEpisode,
+        releaseDate: null,
+      };
+    }
   };
 }
