@@ -16,5 +16,9 @@ export function availableIn(date: dayjs.Dayjs) {
     label = `Released on ${date.format('DD/MM/YYYY')}`;
   }
 
+  if (date.format('YYYY-MM-DD') === '1901-01-01') {
+    label = `Unknown release date`;
+  }
+
   return label;
 }
