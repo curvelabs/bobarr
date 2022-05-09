@@ -309,7 +309,8 @@ export class OrganizeProcessor {
 
         const [, episodeNb1] = /S\d+\W?E(\d+)/.exec(fileName) || []; // Foobar_S01E01.mkv
         const [, episodeNb2] = /\d+X(\d+)/.exec(fileName) || []; // Foobar_1x01.mkv
-        const episodeNb = episodeNb1 || episodeNb2;
+        const [, episodeNb3] = /^(\d{1,3})[^a-zA-Z0-9]/.exec(fileName) || []; // Foobar_1x01.mkv
+        const episodeNb = episodeNb1 || episodeNb2 || episodeNb3;
 
         const [, part] = /part ?(\d+)/.exec(fileName.toLowerCase()) || []; // Foobar_S01E01_Part1
 
