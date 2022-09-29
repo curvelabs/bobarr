@@ -369,7 +369,7 @@ export class TMDBService {
       overview: result.overview,
       originalTitle: result.original_name,
       originCountry: result.origin_country,
-      releaseDate: result.first_air_date ?? dayjs().year,
+      releaseDate: result.first_air_date ?? dayjs().format('YYYY-MM-DD'),
       posterPath: result.poster_path,
       voteAverage: result.vote_average,
     };
