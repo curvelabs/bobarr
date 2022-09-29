@@ -809,7 +809,7 @@ export class LibraryService {
 
       return {
         ...tvEpisode,
-        releaseDate: tmdbResult.air_date,
+        releaseDate: tmdbResult.air_date ?? '1901-01-01',
       };
     } catch (e) {
       return {

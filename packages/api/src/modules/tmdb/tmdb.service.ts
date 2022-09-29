@@ -28,7 +28,6 @@ import {
 import { CacheMethod } from '../redis/cache.interceptor';
 import { CacheKeys } from '../redis/cache.dto';
 import { RedisService } from '../redis/redis.service';
-import dayjs from 'dayjs';
 
 @Injectable()
 export class TMDBService {
@@ -369,7 +368,7 @@ export class TMDBService {
       overview: result.overview,
       originalTitle: result.original_name,
       originCountry: result.origin_country,
-      releaseDate: result.first_air_date ?? dayjs().format('YYYY-MM-DD'),
+      releaseDate: result.first_air_date,
       posterPath: result.poster_path,
       voteAverage: result.vote_average,
     };
