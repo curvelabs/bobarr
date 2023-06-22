@@ -133,13 +133,18 @@ export class OrganizeProcessor {
       folderName
     );
 
+    const downloadsFolder = path.resolve(
+      __dirname,
+      `../../../../../../downloads/complete`
+    );
+
     await childCommand(`mkdir -p "${newFolder}"`);
     await mapSeries(torrentFiles, async (torrentFile) => {
       await childCommand(
         oneLine`
             cd "${newFolder}" &&
             ${this.getOrganizeStrategyCommand(organizeStrategy)}
-              "../../downloads/complete/${torrentFile.original}"
+              "${downloadsFolder}/${torrentFile.original}"
               "${torrentFile.next}"
           `
       );
@@ -206,6 +211,11 @@ export class OrganizeProcessor {
       `Season ${seasonNb}`
     );
 
+    const downloadsFolder = path.resolve(
+      __dirname,
+      `../../../../../../downloads/complete`
+    );
+
     const torrentFiles = torrent.transmissionTorrent.files
       .filter((file) => {
         const ext = path.extname(file.name);
@@ -227,7 +237,7 @@ export class OrganizeProcessor {
         oneLine`
           cd "${seasonFolder}" &&
           ${this.getOrganizeStrategyCommand(organizeStrategy)}
-            "../../../downloads/complete/${torrentFile.original}"
+            "${downloadsFolder}/${torrentFile.original}"
             "${torrentFile.next}"
         `
       );
@@ -292,6 +302,11 @@ export class OrganizeProcessor {
       `../../../../../../library/${LIBRARY_CONFIG.tvShowsFolderName}/`,
       tvShow.title,
       `Season ${seasonNb}`
+    );
+
+    const downloadsFolder = path.resolve(
+      __dirname,
+      `../../../../../../downloads/complete`
     );
 
     const torrentFiles = torrent.transmissionTorrent.files.reduce(
@@ -373,7 +388,7 @@ export class OrganizeProcessor {
         oneLine`
           cd "${seasonFolder}" &&
           ${this.getOrganizeStrategyCommand(organizeStrategy)}
-          "../../../downloads/complete/${file.original}"
+          "${downloadsFolder}/${file.original}"
           "${newName}${file.ext}"
         `
       );
