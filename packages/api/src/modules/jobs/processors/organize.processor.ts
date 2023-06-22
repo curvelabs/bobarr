@@ -135,7 +135,7 @@ export class OrganizeProcessor {
 
     const downloadsFolder = path.resolve(
       __dirname,
-      `../../../../../../downloads/complete`
+      `../../../../../../library/downloads/complete`
     );
 
     await childCommand(`mkdir -p "${newFolder}"`);
@@ -213,7 +213,7 @@ export class OrganizeProcessor {
 
     const downloadsFolder = path.resolve(
       __dirname,
-      `../../../../../../downloads/complete`
+      `../../../../../../library/downloads/complete`
     );
 
     const torrentFiles = torrent.transmissionTorrent.files
@@ -306,7 +306,7 @@ export class OrganizeProcessor {
 
     const downloadsFolder = path.resolve(
       __dirname,
-      `../../../../../../downloads/complete`
+      `../../../../../../library/downloads/complete`
     );
 
     const torrentFiles = torrent.transmissionTorrent.files.reduce(
