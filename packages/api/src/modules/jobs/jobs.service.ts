@@ -65,7 +65,7 @@ export class JobsService {
 
     this.startDownloadMissing({
       repeat: {
-        cron: '*/30 * * * *', // every 30 minutes
+        cron: '0 */2 * * *', // every 2 hours
         startDate: new Date(),
       },
     });
