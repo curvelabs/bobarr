@@ -210,7 +210,7 @@ export class ScanLibraryProcessor {
       this.logger.info('movie already tracked in library', { untrackedFiles });
 
       await forEachSeries(untrackedFiles, ({ file }) =>
-        fileDAO.save({ path: file, movieId: movieInDatabase.match?.id })
+        fileDAO.save({ path: file, movieId: movieInDatabase.match?.movie.id })
       );
 
       return;
