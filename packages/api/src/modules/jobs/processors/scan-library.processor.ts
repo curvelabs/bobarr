@@ -208,7 +208,7 @@ export class ScanLibraryProcessor {
 
     if (movieInDatabase) {
       this.logger.info('movie already tracked in library', {
-        movieInDatabase,
+        movieId: movieInDatabase.match?.movie.id,
         untrackedFiles,
       });
 
