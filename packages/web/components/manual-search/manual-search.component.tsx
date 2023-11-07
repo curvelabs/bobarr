@@ -86,7 +86,6 @@ export function ManualSearchComponent(props: ManualSearchProps) {
         },
       });
     } else {
-      console.log(file, props.media);
       notification.error({
         message: 'No file selected',
       });
@@ -135,6 +134,7 @@ export function ManualSearchComponent(props: ManualSearchProps) {
   return (
     <Modal
       visible={true}
+      maskClosable={false}
       destroyOnClose={true}
       onCancel={handleClose}
       centered={true}
