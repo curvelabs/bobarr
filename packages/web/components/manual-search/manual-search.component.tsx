@@ -85,6 +85,11 @@ export function ManualSearchComponent(props: ManualSearchProps) {
           torrent: base64,
         },
       });
+    } else {
+      console.log(file, props.media);
+      notification.error({
+        message: 'No file selected',
+      });
     }
 
     setUploadTorrentLoading(false);
