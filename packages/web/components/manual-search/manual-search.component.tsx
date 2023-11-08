@@ -136,7 +136,7 @@ export function ManualSearchComponent(props: ManualSearchProps) {
       visible={true}
       maskClosable={false}
       destroyOnClose={true}
-      onCancel={handleClose}
+      // onCancel={handleClose}
       centered={true}
       width={960}
       footer={[
@@ -172,6 +172,8 @@ export function ManualSearchComponent(props: ManualSearchProps) {
             type="primary"
             className="action-btn"
             onClick={handlePasteMagnetLink}
+            loading={isUploadTorrentLoading}
+            disabled={isUploadTorrentLoading}
           >
             Paste magnet link
           </Button>
