@@ -1,0 +1,10 @@
+mutation skipMissingEpisode(
+  $mediaId: Int!
+) {
+  skipMissingEpisode(
+    mediaId: $mediaId
+  ) {
+    success
+    message
+  }
+}

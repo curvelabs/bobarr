@@ -32,6 +32,7 @@ type Movie {
 enum DownloadableMediaState {
   SEARCHING
   MISSING
+  SKIPPED
   DOWNLOADING
   DOWNLOADED
   PROCESSED
@@ -302,7 +303,8 @@ type Mutation {
   trackTVShow(seasonNumbers: [Int!]!, tmdbId: Int!): TVShow!
   removeTVShow(tmdbId: Int!): GraphQLCommonResponse!
   resetLibrary(resetSettings: Boolean!, deleteFiles: Boolean!): GraphQLCommonResponse!
-  downloadOwnTorrent(torrent: String!, mediaType: FileType!, mediaId: Int!): GraphQLCommonResponse!
+  downloadOwnTorrent(mediaInfos: MediaInfosInput!, torrent: String!, mediaType: FileType!, mediaId: Int!): GraphQLCommonResponse!
+  skipMissingEpisode(mediaId: Int!): GraphQLCommonResponse!
 }
 
 input QualityInput {
@@ -325,4 +327,11 @@ input JackettInput {
   downloadLink: String!
   quality: String!
   tag: String!
+}
+
+input MediaInfosInput {
+  movieTMDBId: Int!
+  tvShowTMDBId: Int!
+  seasonNumber: Int!
+  episodeNumber: Int!
 }

@@ -48,6 +48,7 @@ export type Movie = {
 export enum DownloadableMediaState {
   Searching = 'SEARCHING',
   Missing = 'MISSING',
+  Skipped = 'SKIPPED',
   Downloading = 'DOWNLOADING',
   Downloaded = 'DOWNLOADED',
   Processed = 'PROCESSED'
@@ -395,6 +396,7 @@ export type Mutation = {
   removeTVShow: GraphQlCommonResponse;
   resetLibrary: GraphQlCommonResponse;
   downloadOwnTorrent: GraphQlCommonResponse;
+  skipMissingEpisode: GraphQlCommonResponse;
 };
 
 
@@ -467,8 +469,14 @@ export type MutationResetLibraryArgs = {
 
 
 export type MutationDownloadOwnTorrentArgs = {
+  mediaInfos: MediaInfosInput;
   torrent: Scalars['String'];
   mediaType: FileType;
+  mediaId: Scalars['Int'];
+};
+
+
+export type MutationskipMissingEpisodeArgs = {
   mediaId: Scalars['Int'];
 };
 
@@ -494,6 +502,13 @@ export type JackettInput = {
   tag: Scalars['String'];
 };
 
+export type MediaInfosInput = {
+  movieTMDBId: Scalars['Int'];
+  tvShowTMDBId: Scalars['Int'];
+  seasonNumber: Scalars['Int'];
+  episodeNumber: Scalars['Int'];
+};
+
 export type ClearCacheMutationVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -509,6 +524,7 @@ export type DownloadOwnTorrentMutationVariables = Exact<{
   mediaId: Scalars['Int'];
   mediaType: FileType;
   torrent: Scalars['String'];
+  mediaInfos: MediaInfosInput;
 }>;
 
 
@@ -671,6 +687,19 @@ export type SaveTagsMutationVariables = Exact<{
 export type SaveTagsMutation = (
   { __typename?: 'Mutation' }
   & { result: (
+    { __typename?: 'GraphQLCommonResponse' }
+    & Pick<GraphQlCommonResponse, 'success' | 'message'>
+  ) }
+);
+
+export type skipMissingEpisodeMutationVariables = Exact<{
+  mediaId: Scalars['Int'];
+}>;
+
+
+export type skipMissingEpisodeMutation = (
+  { __typename?: 'Mutation' }
+  & { skipMissingEpisode: (
     { __typename?: 'GraphQLCommonResponse' }
     & Pick<GraphQlCommonResponse, 'success' | 'message'>
   ) }
@@ -1070,8 +1099,13 @@ export type ClearCacheMutationHookResult = ReturnType<typeof useClearCacheMutati
 export type ClearCacheMutationResult = Apollo.MutationResult<ClearCacheMutation>;
 export type ClearCacheMutationOptions = Apollo.BaseMutationOptions<ClearCacheMutation, ClearCacheMutationVariables>;
 export const DownloadOwnTorrentDocument = gql`
-    mutation downloadOwnTorrent($mediaId: Int!, $mediaType: FileType!, $torrent: String!) {
-  downloadOwnTorrent(mediaId: $mediaId, mediaType: $mediaType, torrent: $torrent) {
+    mutation downloadOwnTorrent($mediaId: Int!, $mediaType: FileType!, $torrent: String!, $mediaInfos: MediaInfosInput!) {
+  downloadOwnTorrent(
+    mediaId: $mediaId
+    mediaType: $mediaType
+    torrent: $torrent
+    mediaInfos: $mediaInfos
+  ) {
     success
     message
   }
@@ -1258,6 +1292,20 @@ export function useSaveTagsMutation(baseOptions?: Apollo.MutationHookOptions<Sav
 export type SaveTagsMutationHookResult = ReturnType<typeof useSaveTagsMutation>;
 export type SaveTagsMutationResult = Apollo.MutationResult<SaveTagsMutation>;
 export type SaveTagsMutationOptions = Apollo.BaseMutationOptions<SaveTagsMutation, SaveTagsMutationVariables>;
+export const skipMissingEpisodeDocument = gql`
+    mutation skipMissingEpisode($mediaId: Int!) {
+  skipMissingEpisode(mediaId: $mediaId) {
+    success
+    message
+  }
+}
+    `;
+export function useskipMissingEpisodeMutation(baseOptions?: Apollo.MutationHookOptions<skipMissingEpisodeMutation, skipMissingEpisodeMutationVariables>) {
+        return Apollo.useMutation<skipMissingEpisodeMutation, skipMissingEpisodeMutationVariables>(skipMissingEpisodeDocument, baseOptions);
+      }
+export type skipMissingEpisodeMutationHookResult = ReturnType<typeof useskipMissingEpisodeMutation>;
+export type skipMissingEpisodeMutationResult = Apollo.MutationResult<skipMissingEpisodeMutation>;
+export type skipMissingEpisodeMutationOptions = Apollo.BaseMutationOptions<skipMissingEpisodeMutation, skipMissingEpisodeMutationVariables>;
 export const TrackMovieDocument = gql`
     mutation trackMovie($title: String!, $tmdbId: Int!) {
   movie: trackMovie(title: $title, tmdbId: $tmdbId) {

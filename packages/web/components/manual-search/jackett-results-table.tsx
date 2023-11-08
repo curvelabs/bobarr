@@ -176,7 +176,7 @@ function ManualDownloadMedia({
       }),
     onCompleted: () =>
       notification.success({
-        message: 'Download episode started',
+        message: 'Download season started',
         placement: 'bottomRight',
       }),
   });

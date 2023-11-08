@@ -68,6 +68,20 @@ export class TransmissionService {
 
     this.logger.info('torrent download started', torrentAttributes);
 
+    let existingTorrentEntity = await this.torrentDAO.findOne({
+      torrentHash: transmissionTorrent.hashString,
+    });
+
+    if (existingTorrentEntity) {
+      existingTorrentEntity = await torrentDAO.save({
+        ...existingTorrentEntity,
+        ...torrentAttributes,
+        torrentHash: transmissionTorrent.hashString,
+      });
+
+      return existingTorrentEntity;
+    }
+
     const torrentEntity = await torrentDAO.save({
       ...torrentAttributes,
       torrentHash: transmissionTorrent.hashString,

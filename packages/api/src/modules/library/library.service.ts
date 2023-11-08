@@ -31,7 +31,7 @@ import { JobsService } from 'src/modules/jobs/jobs.service';
 import { TransmissionService } from 'src/modules/transmission/transmission.service';
 import { ParamsService } from 'src/modules/params/params.service';
 
-import { JackettInput } from './library.dto';
+import { JackettInput, MediaInfosInput } from './library.dto';
 import { FileDAO } from 'src/entities/dao/file.dao';
 
 @Injectable()
@@ -616,26 +616,43 @@ export class LibraryService {
       mediaId,
       mediaType,
       torrent,
+      mediaInfos,
     }: {
       mediaId: number;
       mediaType: FileType;
       torrent: string;
+      mediaInfos: MediaInfosInput;
     },
     @TransactionManager() manager: EntityManager | null
   ) {
     this.logger.info('start download own torrent', { mediaId, mediaType });
 
-    const baseOpts = {
-      torrent,
-      torrentType: torrent.startsWith('magnet') ? 'url' : 'base64',
-      torrentAttributes: {
-        resourceId: mediaId,
-        resourceType: mediaType,
-      },
-    } as const;
+    let finalMediaId = mediaId;
 
     if (mediaType === FileType.SEASON) {
-      await this.replaceSeason(mediaId, manager!);
+      await this.trackTVShowWithoutDownload({
+        tmdbId: mediaInfos.tvShowTMDBId,
+        seasonNumbers: [mediaInfos.seasonNumber],
+      });
+
+      const { seasons } = await this.tvShowDAO
+        .createQueryBuilder('tvShow')
+        .innerJoinAndSelect(
+          'tvShow.seasons',
+          'season',
+          'season.seasonNumber = :seasonNumber',
+          { seasonNumber: mediaInfos.seasonNumber }
+        )
+        .where('tvShow.tmdbId = :tvShowTMDBId', {
+          tvShowTMDBId: mediaInfos.tvShowTMDBId,
+        })
+        .getOneOrFail();
+
+      const [{ id: seasonId }] = seasons;
+
+      await this.replaceSeason(seasonId, manager!);
+
+      finalMediaId = seasonId;
     }
 
     if (mediaType === FileType.EPISODE) {
@@ -643,8 +660,31 @@ export class LibraryService {
     }
 
     if (mediaType === FileType.MOVIE) {
-      await this.replaceMovie(mediaId, manager!);
+      if (mediaInfos.movieTMDBId > 0) {
+        const movieResult = await this.tmdbService.getMovie(
+          mediaInfos.movieTMDBId
+        );
+        const movie = await this.trackMovieWithoutDownload({
+          title: movieResult.title,
+          tmdbId: mediaInfos.movieTMDBId,
+        });
+
+        await this.replaceMovie(movie.id, manager!);
+
+        finalMediaId = movie.id;
+      } else {
+        await this.replaceMovie(mediaId, manager!);
+      }
     }
+
+    const baseOpts = {
+      torrent,
+      torrentType: torrent.startsWith('magnet') ? 'url' : 'base64',
+      torrentAttributes: {
+        resourceId: finalMediaId,
+        resourceType: mediaType,
+      },
+    } as const;
 
     const torrentEntity = await this.transmissionService.addTorrent(
       baseOpts,
@@ -655,6 +695,27 @@ export class LibraryService {
       mediaId,
       mediaType,
       torrentId: torrentEntity.id,
+    });
+  }
+
+  @LazyTransaction()
+  public async skipMissingEpisode(
+    {
+      mediaId,
+    }: {
+      mediaId: number;
+    },
+    @TransactionManager() manager: EntityManager | null
+  ) {
+    this.logger.info('skip missing media', { mediaId });
+
+    const tvEpisodeDAO = manager!.getCustomRepository(TVEpisodeDAO);
+
+    const tvEpisode = await tvEpisodeDAO.findOneOrFail({ id: mediaId });
+
+    await tvEpisodeDAO.save({
+      id: tvEpisode.id,
+      state: DownloadableMediaState.SKIPPED,
     });
   }
 
