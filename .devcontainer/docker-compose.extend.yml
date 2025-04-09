@@ -1,0 +1,47 @@
+version: "3.6"
+
+services:
+  workspace:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    container_name: bobarr-workspace
+    volumes:
+      - ..:/workspace:cached
+      - ~/deploying/devcontain/features:/features:cached
+    command: sleep infinity
+    user: vscode
+    environment:
+      - NODE_ENV=development
+    ports:
+      - 3001:3001 # Alternative port for development
+    networks:
+      - default
+
+  # Modify existing services to work better with devcontainer
+  api:
+    volumes:
+      - ..:/workspace:cached
+      - ./library:/usr/library
+    depends_on:
+      - postgres
+      - redis
+
+  web:
+    volumes:
+      - ..:/workspace:cached
+    depends_on:
+      - api
+
+  # Make sure data persists
+  postgres:
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=bobarr
+      - POSTGRES_PASSWORD=bobarr
+      - POSTGRES_DB=bobarr
+
+  redis:
+    environment:
+      - REDIS_PASSWORD=bobarr

@@ -1,0 +1,83 @@
+{
+  "name": "Bobarr Development",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "remoteUser": "vscode",
+  "workspaceFolder": "/workspace",
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "mikestead.dotenv",
+        "ms-azuretools.vscode-docker",
+        "editorconfig.editorconfig",
+        "orta.vscode-jest",
+        "rooveterinaryinc.roo-cline",
+        "kilocode.kilo-code"
+      ],
+      "settings": {
+        "files.associations": {
+          "docker-compose*.yml": "dockercompose",
+          "Dockerfile*": "dockerfile"
+        },
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": true
+        },
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "editor.formatOnSave": true,
+        "git.enableSmartCommit": true,
+        "git.autofetch": true,
+        "breadcrumbs.enabled": true,
+        "git.confirmSync": false,
+        "explorer.confirmDelete": false,
+        "code-runner.saveFileBeforeRun": true,
+        "code-runner.saveAllFilesBeforeRun": true,
+        "workbench.activityBar.visible": true,
+        "files.trimTrailingWhitespace": true,
+        "telemetry.enableTelemetry": false,
+        "scm.providers.visible": 0,
+        "editor.linkedEditing": true,
+        "workbench.colorCustomizations": {
+          "editor.selectionBackground": "#e788ff7c",
+          "editor.selectionHighlightBackground": "#ff00005b",
+          "editor.findMatchBackground": "#00cc44a8",
+          "editor.findMatchHighlightBackground": "#ff7b00a1",
+          "numberedBookmarks.lineBackground": "#007700",
+          "editor.selectionHighlightBorder": "#FFFAFA"
+        }
+      }
+    },
+    "codespaces": {
+      "repositories": {
+        "*/*": {
+          "permissions": "write-all"
+        }
+      }
+    }
+  },
+  
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.env.devcontainer,target=/workspace/.env.secrets,type=bind,consistency=cached,optional=true"
+  ],
+  
+  "overrideCommand": false,
+  "shutdownAction": "stopCompose",
+  "forwardPorts": [3000, 4000, 5432, 6379, 9091, 9117, 8191],
+  
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+    "../docker-compose.dev.yml",
+    "docker-compose.extend.yml"
+  ],
+  "service": "workspace",
+  
+  "postCreateCommand": "/workspace/.devcontainer/post-create.sh",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  }
+}

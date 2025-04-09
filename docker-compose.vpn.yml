@@ -19,8 +19,8 @@ services:
     volumes:
       - /dev/net:/dev/net:z
       - ./packages/vpn:/vpn
-    entrypoint: "bash -c"
-    command: "exit 0"
+    # entrypoint: "bash -c"
+    # command: "exit 0"
     restart: always
     entrypoint: ["/sbin/tini", "--", "/usr/bin/openvpn.sh"]
     command: '-p "51413" -p "51413;udp" -f ""'
