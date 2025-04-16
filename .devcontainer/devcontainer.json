@@ -16,12 +16,30 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        "ms-python.python",
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
-        "mikestead.dotenv",
         "ms-azuretools.vscode-docker",
-        "editorconfig.editorconfig",
-        "orta.vscode-jest"
+        "docker.docker",
+        "github.codespaces",
+        "fill-labs.dependi",
+        "github.copilot",
+        "github.copilot-chat",
+        "github.vscode-github-actions",
+        "github.vscode-pull-request-github",
+        "github.github-vscode-theme",
+        "ms-vscode-remote.vscode-remote-extensionpack",
+        "ms-python.debugpy",
+        "ms-python.vscode-pylance",
+        "redhat.vscode-yaml",
+        "vscode-icons-team.vscode-icons",
+        "wakatime.vscode-wakatime",
+        "alefragnani.numbered-bookmarks",
+        "fabiospampinato.vscode-highlight",
+        "eamodio.gitlens",
+        "mechatroner.rainbow-csv",
+        "tomoki1207.pdf",
+        "yzhang.markdown-all-in-one"
       ],
       "settings": {
         "files.associations": {
@@ -34,7 +52,25 @@
         "terminal.integrated.defaultProfile.linux": "bash",
         "editor.formatOnSave": true,
         "git.enableSmartCommit": true,
-        "git.autofetch": true
+        "git.autofetch": true,
+        "breadcrumbs.enabled": true,
+        "git.confirmSync": false,
+        "explorer.confirmDelete": false,
+        "code-runner.saveFileBeforeRun": true,
+        "code-runner.saveAllFilesBeforeRun": true,
+        "workbench.activityBar.visible": true,
+        "files.trimTrailingWhitespace": true,
+        "telemetry.enableTelemetry": false,
+        "scm.providers.visible": 0,
+        "editor.linkedEditing": true,
+        "workbench.colorCustomizations": {
+          "editor.selectionBackground": "#e788ff7c",
+          "editor.selectionHighlightBackground": "#ff00005b",
+          "editor.findMatchBackground": "#00cc44a8",
+          "editor.findMatchHighlightBackground": "#ff7b00a1",
+          "numberedBookmarks.lineBackground": "#007700",
+          "editor.selectionHighlightBorder": "#FFFAFA"
+        }
       }
     }
   },
@@ -61,6 +97,14 @@
   "postStartCommand": "sudo chown -R vscode:vscode /var/run/docker-host.sock || true",
   
   "features": {
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/python:1": {
+        "version": "3.11"
+    },
+    "ghcr.io/jsburckhardt/devcontainer-features/uv:1": {},
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    "ghcr.io/devcontainers/features/desktop-lite:1": {}
+
   }
 }
