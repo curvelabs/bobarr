@@ -4,32 +4,32 @@ services:
   workspace:
     build:
       context: .
-      dockerfile: .devcontainer/Dockerfile
+      dockerfile: Dockerfile
     container_name: bobarr-workspace
-    volumes:
-      - ..:/workspace:cached
-      - ~/deploying/devcontain/features:/features:cached
+    # Workspace volume is managed by devcontainer.json workspaceMount
     command: sleep infinity
     user: vscode
+    volumes:
+      - ${localWorkspaceFolder:-.}:/workspaces/bobarr:cached
+      - /var/run/docker.sock:/var/run/docker-host.sock:rw
     environment:
       - NODE_ENV=development
+      - DOCKER_HOST=unix:///var/run/docker-host.sock
+    working_dir: /workspaces/bobarr
     ports:
-      - 3001:3001 # Alternative port for development
+      - 3001:3001
     networks:
       - default
 
   # Modify existing services to work better with devcontainer
   api:
     volumes:
-      - ..:/workspace:cached
-      - ./library:/usr/library
+      - /workspaces/bobarr/library:/usr/library
     depends_on:
       - postgres
       - redis
 
   web:
-    volumes:
-      - ..:/workspace:cached
     depends_on:
       - api
 

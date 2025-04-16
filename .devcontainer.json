@@ -7,14 +7,43 @@
     ".devcontainer/docker-compose.extend.yml"
   ],
   "service": "workspace",
-  "workspaceFolder": "/workspace",
+  "workspaceFolder": "/workspaces/bobarr",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/bobarr,type=bind,consistency=cached",
+  "remoteUser": "vscode",
+  "overrideCommand": false,
   "customizations": {
-    "codespaces": {
-      "repositories": {
-        "*/*": {
-          "permissions": "write-all"
-        }
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "mikestead.dotenv",
+        "ms-azuretools.vscode-docker",
+        "editorconfig.editorconfig",
+        "orta.vscode-jest"
+      ],
+      "settings": {
+        "files.associations": {
+          "docker-compose*.yml": "dockercompose",
+          "Dockerfile*": "dockerfile"
+        },
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": true
+        },
+        "remote.containers.defaultFolderPath": "/workspaces/bobarr",
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "editor.formatOnSave": true,
+        "git.enableSmartCommit": true,
+        "git.autofetch": true
       }
     }
+  },
+  "shutdownAction": "stopCompose",
+  "forwardPorts": [3000, 3001, 4000, 5432, 6379, 9091, 9117, 8191],
+  "portsAttributes": {
+    "3000": { "label": "Web UI", "onAutoForward": "notify" },
+    "4000": { "label": "API", "onAutoForward": "notify" },
+    "9091": { "label": "Transmission", "onAutoForward": "notify" },
+    "9117": { "label": "Jackett", "onAutoForward": "notify" },
+    "8191": { "label": "FlareSolverr", "onAutoForward": "notify" }
   }
 }

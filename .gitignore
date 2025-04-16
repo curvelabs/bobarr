@@ -32,3 +32,4 @@ library/movies/*
 !library/movies/.gitkeep
 library/tvshows/*
 !library/tvshows/.gitkeep
+packages/transmission/config/settings.json

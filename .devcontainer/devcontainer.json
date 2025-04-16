@@ -1,11 +1,18 @@
 {
+  "$schema": "https://aka.ms/devcontainer.schema.json",
   "name": "Bobarr Development",
   "build": {
-    "dockerfile": "Dockerfile"
+    "dockerfile": "Dockerfile",
+    "context": "."
   },
   "remoteUser": "vscode",
-  "workspaceFolder": "/workspace",
-  
+
+  "workspaceMount": "source=${localWorkspaceFolder}/bobarr,target=/workspaces,type=bind,consistency=cached",
+  "workspaceFolder": "/workspaces",
+  "containerEnv": {
+    "WORKSPACE_FOLDER": "/workspaces"
+  },
+
   "customizations": {
     "vscode": {
       "extensions": [
@@ -14,9 +21,7 @@
         "mikestead.dotenv",
         "ms-azuretools.vscode-docker",
         "editorconfig.editorconfig",
-        "orta.vscode-jest",
-        "rooveterinaryinc.roo-cline",
-        "kilocode.kilo-code"
+        "orta.vscode-jest"
       ],
       "settings": {
         "files.associations": {
@@ -29,44 +34,21 @@
         "terminal.integrated.defaultProfile.linux": "bash",
         "editor.formatOnSave": true,
         "git.enableSmartCommit": true,
-        "git.autofetch": true,
-        "breadcrumbs.enabled": true,
-        "git.confirmSync": false,
-        "explorer.confirmDelete": false,
-        "code-runner.saveFileBeforeRun": true,
-        "code-runner.saveAllFilesBeforeRun": true,
-        "workbench.activityBar.visible": true,
-        "files.trimTrailingWhitespace": true,
-        "telemetry.enableTelemetry": false,
-        "scm.providers.visible": 0,
-        "editor.linkedEditing": true,
-        "workbench.colorCustomizations": {
-          "editor.selectionBackground": "#e788ff7c",
-          "editor.selectionHighlightBackground": "#ff00005b",
-          "editor.findMatchBackground": "#00cc44a8",
-          "editor.findMatchHighlightBackground": "#ff7b00a1",
-          "numberedBookmarks.lineBackground": "#007700",
-          "editor.selectionHighlightBorder": "#FFFAFA"
-        }
-      }
-    },
-    "codespaces": {
-      "repositories": {
-        "*/*": {
-          "permissions": "write-all"
-        }
+        "git.autofetch": true
       }
     }
   },
   
-  "mounts": [
-    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
-    "source=${localEnv:HOME}/.env.devcontainer,target=/workspace/.env.secrets,type=bind,consistency=cached,optional=true"
-  ],
-  
   "overrideCommand": false,
   "shutdownAction": "stopCompose",
-  "forwardPorts": [3000, 4000, 5432, 6379, 9091, 9117, 8191],
+  "forwardPorts": [3000, 3001, 4000, 5432, 6379, 9091, 9117, 8191],
+  "portsAttributes": {
+    "3000": { "label": "Web UI", "onAutoForward": "notify" },
+    "4000": { "label": "API", "onAutoForward": "notify" },
+    "9091": { "label": "Transmission", "onAutoForward": "notify" },
+    "9117": { "label": "Jackett", "onAutoForward": "notify" },
+    "8191": { "label": "FlareSolverr", "onAutoForward": "notify" }
+  },
   
   "dockerComposeFile": [
     "../docker-compose.yml",
@@ -75,7 +57,8 @@
   ],
   "service": "workspace",
   
-  "postCreateCommand": "/workspace/.devcontainer/post-create.sh",
+  "postCreateCommand": "echo 'Setup complete'",
+  "postStartCommand": "sudo chown -R vscode:vscode /var/run/docker-host.sock || true",
   
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {}
