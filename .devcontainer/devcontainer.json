@@ -7,7 +7,7 @@
   },
   "remoteUser": "vscode",
 
-  "workspaceMount": "source=${localWorkspaceFolder}/bobarr,target=/workspaces,type=bind,consistency=cached",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces,type=bind,consistency=cached",
   "workspaceFolder": "/workspaces",
   "containerEnv": {
     "WORKSPACE_FOLDER": "/workspaces"
