@@ -1,4 +1,4 @@
-node_modules
+**/node_modules
 
 # misc
 .DS_Store
@@ -33,3 +33,6 @@ library/movies/*
 library/tvshows/*
 !library/tvshows/.gitkeep
 packages/transmission/config/settings.json
+
+_node_modules
+node_modules

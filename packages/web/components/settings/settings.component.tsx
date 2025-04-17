@@ -12,12 +12,12 @@ export function SettingsComponent() {
       <div className="wrapper">
         <div className="flex">
           <div className="row">
-            <SettingsFormComponent />
-            <TagsComponent />
-          </div>
-          <div className="row">
             <ActionsComponents />
             <QualityParamsComponent />
+          </div>
+          <div className="row">
+            <TagsComponent />
+            <SettingsFormComponent />
           </div>
         </div>
       </div>

@@ -7,9 +7,11 @@
   },
   "remoteUser": "vscode",
 
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/bobarr,type=bind,consistency=cached",
   "workspaceFolder": "/workspaces",
   "containerEnv": {
-    "WORKSPACE_FOLDER": "/workspaces"
+    "WORKSPACE_FOLDER": "/workspaces",
+    "VSCODE_NODEJS_RUNTIME_DIR": "/tmp/vscode-nodejs"
   },
 
   "customizations": {
@@ -73,7 +75,7 @@
       }
     }
   },
-  
+
   "overrideCommand": false,
   "shutdownAction": "stopCompose",
   "forwardPorts": [3000, 3001, 4000, 5432, 6379, 9091, 9117, 8191],
@@ -84,26 +86,31 @@
     "9117": { "label": "Jackett", "onAutoForward": "notify" },
     "8191": { "label": "FlareSolverr", "onAutoForward": "notify" }
   },
-  
+
   "dockerComposeFile": [
     "../docker-compose.yml",
     "../docker-compose.dev.yml",
     "docker-compose.extend.yml"
   ],
   "service": "workspace",
-  
-  "postCreateCommand": "echo 'Setup complete'",
+
+  "postCreateCommand": "mkdir -p /tmp/vscode-nodejs && echo 'Setup complete'",
   "postStartCommand": "sudo chown -R vscode:vscode /var/run/docker-host.sock || true",
-  
+
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/node:1": {
+      "version":"18"
+    },
     "ghcr.io/devcontainers/features/git:1": {},
     "ghcr.io/devcontainers/features/python:1": {
         "version": "3.11"
     },
     "ghcr.io/jsburckhardt/devcontainer-features/uv:1": {},
     "ghcr.io/devcontainers/features/common-utils:2": {},
-    "ghcr.io/devcontainers/features/desktop-lite:1": {}
-
+    "ghcr.io/devcontainers/features/desktop-lite:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:1": {
+      "version": "latest"
+    }
   }
 }

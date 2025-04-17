@@ -13,7 +13,6 @@ import {
   GetTvSeasonDetailsDocument,
 } from '../../utils/graphql';
 
-import { availableIn } from '../../utils/available-in';
 import { ManualSearchComponent } from '../manual-search/manual-search.component';
 import { Media } from '../manual-search/manual-search.helpers';
 
@@ -41,6 +40,23 @@ export function TVSeasonDetailsComponent({
     setIsOpen(!isOpen);
   };
 
+  // Custom function to display release dates in a user-friendly format
+  const formatReleaseDate = (date: string | null) => {
+    if (!date) return 'Unknown date';
+    
+    const releaseDate = dayjs(date);
+    const now = dayjs();
+    const daysUntilRelease = releaseDate.diff(now, 'day');
+    
+    if (daysUntilRelease > 0) {
+      return `Coming in ${daysUntilRelease} days`;
+    } else if (daysUntilRelease === 0) {
+      return 'Released today';
+    } else {
+      return releaseDate.format('DD MMM YYYY');
+    }
+  };
+
   const columns: ColumnsType<EnrichedTvEpisode> = [
     {
       title: 'Title',
@@ -49,7 +65,7 @@ export function TVSeasonDetailsComponent({
     },
     {
       title: 'Air date',
-      render: (row: EnrichedTvEpisode) => availableIn(dayjs(row.releaseDate)),
+      render: (row: EnrichedTvEpisode) => formatReleaseDate(row.releaseDate),
     },
     {
       title: 'Status',
@@ -154,6 +170,7 @@ export function TVSeasonDetailsComponent({
             showHeader={false}
             pagination={false}
             loading={!data && loading}
+            className="episode-table"
           />
         )}
       </div>

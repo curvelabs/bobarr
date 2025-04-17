@@ -4,7 +4,7 @@ export const DiscoverStyles = styled.div`
   .wrapper {
     max-width: 1200px;
     margin: 0 auto;
-    padding-right: 0 32px;
+    padding: 0 16px;
   }
 
   .flex {
@@ -52,6 +52,23 @@ export const DiscoverStyles = styled.div`
       > div {
         display: inline-block;
         padding-bottom: 20px;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .flex {
+      flex-direction: column;
+    }
+
+    .discover {
+      &--filter {
+        margin-right: 0;
+        margin-bottom: 16px;
+      }
+
+      &--result {
+        max-height: none !important;
       }
     }
   }

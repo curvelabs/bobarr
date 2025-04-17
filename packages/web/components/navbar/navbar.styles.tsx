@@ -7,8 +7,8 @@ export const NavbarStyles = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1;
-  width: 100vw;
+  z-index: 1000;
+  width: 100%;
 
   .wrapper {
     align-items: center;
@@ -69,44 +69,106 @@ export const NavbarStyles = styled.div`
       color: ${({ theme }) => theme.colors.navbarBackground};
     }
   }
-.hamburger {
+
+  .hamburger {
     display: none;
     cursor: pointer;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    margin-left: auto;
+    padding: 5px;
+    padding-right: 24px;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .overlay {
+    position: fixed;
+    top: ${({ theme }) => theme.navbarHeight}px;
+    left: 0;
+    width: 100%;
+    height: calc(100vh - ${({ theme }) => theme.navbarHeight}px);
+    background: rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    z-index: 999;
+
+    &.open {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  .mobile-menu {
+    display: none;
+    flex-direction: column;
+    position: fixed;
+    top: ${({ theme }) => theme.navbarHeight}px;
+    right: 0;
+    width: 66%;
+    height: calc(100vh - ${({ theme }) => theme.navbarHeight}px);
+    background: ${({ theme }) => theme.colors.navbarBackground};
+    padding: 16px;
+    overflow-y: auto;
+    z-index: 1000;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+
+    a {
+      color: #fff;
+      margin-bottom: 16px;
+      font-size: 1.2em;
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+
+      &:hover, &.active {
+        background: rgba(255, 255, 255, 0.1);
+      }
+    }
+
+    .region-select {
+      margin-top: auto;
+      align-self: center;
+      margin-bottom: 30px;
+    }
+
+    &.open {
+      transform: translateX(0);
+    }
   }
 
   @media (max-width: 768px) {
     .wrapper {
       margin: 0 16px;
       justify-content: space-between;
+      width: 100%;
     }
+
+    .logo {
+      font-size: 2em;
+      margin-right: 0;
+    }
+
     .links,
-    .region-select {
+    .wrapper .region-select {
       display: none;
     }
+
     .hamburger {
       display: block;
+      z-index: 1001;
     }
+
     .mobile-menu {
-      display: none;
-      flex-direction: column;
-      position: fixed;
-      top: ${({ theme }) =&gt; theme.navbarHeight}px;
-      left: 0;
-      width: 100vw;
-      height: calc(100vh - ${({ theme }) =&gt; theme.navbarHeight}px);
-      background: ${({ theme }) =&gt; theme.colors.navbarBackground};
-      padding: 16px;
-      overflow-y: auto;
-      z-index: 2;
-    }
-    .mobile-menu a {
-      color: #fff;
-      margin-bottom: 12px;
-      font-size: 1.2em;
-      text-decoration: none;
-    }
-    .mobile-menu.open {
       display: flex;
+      box-shadow: none;
     }
   }
 `;

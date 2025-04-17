@@ -2,32 +2,50 @@ import styled from 'styled-components';
 import { MovieDetailsStyles } from '../movie-details/movie-details.styles';
 
 export const TVShowSeasonsModalComponentStyles = styled(MovieDetailsStyles)`
+  .seasons-container {
+    margin-top: 24px;
+  }
+
+  .seasons-title {
+    font-size: 1.4em;
+    margin-bottom: 16px;
+    color: #fff;
+    opacity: 0.9;
+  }
+
   .seasons {
     display: flex;
     flex-wrap: wrap;
     width: 100%;
+    gap: 10px;
   }
 
   .season-row {
     align-items: center;
     border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
     display: flex;
-    margin-bottom: 8px;
-    margin-right: 4px;
-    margin-left: 4px;
-    padding: 8px 10px;
-    transition: 0.1s linear;
-    max-width: 145px;
+    padding: 10px 12px;
+    transition: all 0.2s ease;
+    width: calc(33.333% - 10px);
+    min-width: 160px;
 
     &.selected {
       border-color: #fff;
+      background: rgba(255, 255, 255, 0.1);
     }
 
     &.in-library {
-      cursor: not-allowed;
+      border-color: rgba(76, 175, 80, 0.7);
+      background: rgba(76, 175, 80, 0.1);
+      cursor: default;
+    }
+
+    &:hover:not(.in-library) {
+      transform: translateY(-3px);
       border-color: #fff;
+      background: rgba(255, 255, 255, 0.07);
     }
   }
 
@@ -38,23 +56,21 @@ export const TVShowSeasonsModalComponentStyles = styled(MovieDetailsStyles)`
 
   .season-episodes-count {
     font-size: 0.9em;
+    opacity: 0.8;
   }
 
   .seasons-details {
-    padding-top: 12px;
+    padding-top: 24px;
 
     .season-top {
-      margin-bottom: 4px;
-    }
-
-    .season-title,
-    .season-top {
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
     }
 
-    .season-title,
-    .season-replace {
+    .season-title {
+      display: flex;
+      align-items: center;
       cursor: pointer;
     }
 
@@ -63,15 +79,21 @@ export const TVShowSeasonsModalComponentStyles = styled(MovieDetailsStyles)`
       display: flex;
       align-items: center;
       margin-left: 32px;
-      border: 1px solid #fff5;
+      border: 1px solid rgba(255, 255, 255, 0.5);
       border-radius: 5px;
-      padding: 0 4px;
+      padding: 4px 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
     }
 
     .season-number {
       font-size: 1.25em;
       font-weight: 600;
-      margin-right: 8px;
+      margin-right: 12px;
     }
 
     .season-year {
@@ -81,21 +103,28 @@ export const TVShowSeasonsModalComponentStyles = styled(MovieDetailsStyles)`
 
     .season-toggle {
       margin-right: 12px;
-      margin-top: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
     }
+  }
 
-    .ant-table {
-      color: #fff;
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 4px;
+  .action-buttons {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+  }
 
-      tr :hover > td {
-        background: inherit;
-      }
+  @media (max-width: 992px) {
+    .season-row {
+      width: calc(50% - 10px);
+    }
+  }
 
-      tr > td {
-        border: none;
-      }
+  @media (max-width: 768px) {
+    .season-row {
+      width: 100%;
+      margin: 0;
     }
   }
 `;

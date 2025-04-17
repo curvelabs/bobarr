@@ -25,6 +25,7 @@ interface TMDBCardComponentProps {
 export function TMDBCardComponent(props: TMDBCardComponentProps) {
   const { result, type, inLibrary } = props;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const posterPath = result.posterPath || '';
 
   return (
     <TMDBCardStyles>
@@ -49,23 +50,28 @@ export function TMDBCardComponent(props: TMDBCardComponentProps) {
       )}
 
       <div className="poster--container" onClick={() => setIsModalOpen(true)}>
+        {/* Media type badge */}
+        <div className="media-type-badge">
+          {type === 'movie' ? 'Movie' : 'TV'}
+        </div>
+        
         <div
           className="poster"
           style={{
-            backgroundImage: `url(${getImageURL(
-              `w220_and_h330_face${result.posterPath})`
-            )}`,
+            backgroundImage: posterPath ? 
+              `url(${getImageURL(`w500_and_h750_face${posterPath}`)})` : 
+              'none'
           }}
         />
         <div className="overlay">
           <>
             <FolderOpenOutlined />
-            <div className="action-label">See details</div>
+            <div className="action-label">View Details</div>
           </>
         </div>
+        
+        <RatingComponent rating={result.voteAverage * 10} />
       </div>
-
-      <RatingComponent rating={result.voteAverage * 10} />
 
       <div className="name">{result.title}</div>
       {result.releaseDate && (

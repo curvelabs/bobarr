@@ -47,7 +47,7 @@ export function MovieDetailsComponent(props: MovieDetailsProps) {
 
   return (
     <>
-      {/* display replace ssearch modal only if we are in library pages */}
+      {/* display replace search modal only if we are in library pages */}
       {isSearchModalOpen && movie.__typename === 'EnrichedMovie' && (
         <ManualSearchComponent
           media={movie}
@@ -56,15 +56,17 @@ export function MovieDetailsComponent(props: MovieDetailsProps) {
       )}
 
       <Modal
-        centered={true}
+        centered
         closable={false}
-        destroyOnClose={true}
+        destroyOnClose
         visible={visible}
         onCancel={onRequestClose}
         footer={null}
-        width="80vw"
+        width="85vw"
         style={{ maxWidth: 1280 }}
-        bodyStyle={{ padding: 3, borderRadius: 4 }}
+        bodyStyle={{ padding: 0, borderRadius: 8, overflow: 'hidden' }}
+        className="movie-details-modal"
+        maskStyle={{ background: 'rgba(0, 0, 0, 0.75)' }}
       >
         <MovieDetailsStyles>
           <div className="close-icon" onClick={onRequestClose}>
@@ -82,10 +84,13 @@ export function MovieDetailsComponent(props: MovieDetailsProps) {
             />
             <div className="header-content">
               <div className="poster-container">
-                <img
-                  src={getImageURL(`w300_and_h450_bestv2${movie.posterPath}`)}
-                  className="poster-image"
-                />
+                <div className="poster-wrapper">
+                  <img
+                    src={getImageURL(`w300_and_h450_bestv2${movie.posterPath}`)}
+                    className="poster-image"
+                    alt={movie.title}
+                  />
+                </div>
               </div>
               <div className="movie-details">
                 <div className="title">
@@ -101,10 +106,11 @@ export function MovieDetailsComponent(props: MovieDetailsProps) {
                   <a
                     className="play-trailer btn"
                     href={youtubeSearchURL}
-                    target="_default"
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     <FaPlay />
-                    <div>Watch trailer on youtube</div>
+                    <div>Watch trailer</div>
                   </a>
                 </div>
                 <div className="overview">{movie.overview}</div>
@@ -120,13 +126,13 @@ export function MovieDetailsComponent(props: MovieDetailsProps) {
                           <div>Replace</div>
                         </div>
                       )}
-                      <div className="btn" onClick={handleRemove}>
+                      <div className="btn btn-danger" onClick={handleRemove}>
                         <FaMinus />
-                        <div>Remove from library</div>
+                        <div>Remove</div>
                       </div>
                     </>
                   ) : (
-                    <div className="btn" onClick={handleAdd}>
+                    <div className="btn btn-success" onClick={handleAdd}>
                       <FaPlus />
                       <div>Add to library</div>
                     </div>

@@ -60,7 +60,7 @@ services:
       - 9117:9117
 
   flaresolverr:
-    image: ghcr.io/flaresolverr/flaresolverr:latest
+    image: flaresolverr/flaresolverr:latest
     container_name: bobarr-flaresolverr
     environment:
       - LOG_LEVEL=info

@@ -44,6 +44,9 @@ export function TVShowSeasonsModalComponent(
     tmdbId: tvShow.tmdbId,
   });
 
+  // Sort seasons numerically to ensure proper ordering
+  const sortedSeasons = [...seasons].sort((a, b) => a.seasonNumber - b.seasonNumber);
+
   const handleClose = () => {
     setSelectedSeasons([]);
     onRequestClose();
@@ -81,9 +84,11 @@ export function TVShowSeasonsModalComponent(
       closable={false}
       destroyOnClose={true}
       footer={null}
-      width="80vw"
-      style={{ maxWidth: 1280 }}
-      bodyStyle={{ padding: 3, borderRadius: 4 }}
+      width="90vw"
+      style={{ maxWidth: 1400 }}
+      bodyStyle={{ padding: 0, borderRadius: 8, overflow: 'hidden' }}
+      className="tvshow-details-modal"
+      maskStyle={{ background: 'rgba(0, 0, 0, 0.75)' }}
     >
       <TVShowSeasonsModalComponentStyles>
         <div className="close-icon" onClick={onRequestClose}>
@@ -101,10 +106,13 @@ export function TVShowSeasonsModalComponent(
           />
           <div className="header-content">
             <div className="poster-container">
-              <img
-                src={getImageURL(`w300_and_h450_bestv2${tvShow.posterPath}`)}
-                className="poster-image"
-              />
+              <div className="poster-wrapper">
+                <img
+                  src={getImageURL(`w300_and_h450_bestv2${tvShow.posterPath}`)}
+                  className="poster-image"
+                  alt={tvShow.title}
+                />
+              </div>
             </div>
             <div className="movie-details">
               <div className="title">
@@ -120,15 +128,16 @@ export function TVShowSeasonsModalComponent(
                 <a
                   className="play-trailer btn"
                   href={youtubeSearchURL}
-                  target="_default"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <FaPlay />
-                  <div>Watch trailer on youtube</div>
+                  <div>Watch trailer</div>
                 </a>
               </div>
               <div className="overview">{tvShow.overview}</div>
               <div className="seasons-details">
-                {seasons
+                {sortedSeasons
                   .filter((season) => season.inLibrary)
                   .map((season) => (
                     <TVSeasonDetailsComponent
@@ -139,9 +148,10 @@ export function TVShowSeasonsModalComponent(
                     />
                   ))}
               </div>
-              <div className="buttons">
+              <div className="seasons-container">
+                <h3 className="seasons-title">Available Seasons</h3>
                 <div className="seasons">
-                  {seasons.map((season) => (
+                  {sortedSeasons.map((season) => (
                     <div
                       key={season.id}
                       onClick={
@@ -169,10 +179,10 @@ export function TVShowSeasonsModalComponent(
                   ))}
                 </div>
               </div>
-              <div className="buttons">
+              <div className="action-buttons">
                 {inLibrary && (
                   <div
-                    className={cx('btn', { disabled: isDeleteButtonDisabled })}
+                    className={cx('btn btn-danger', { disabled: isDeleteButtonDisabled })}
                     onClick={
                       isDeleteButtonDisabled
                         ? undefined
@@ -196,7 +206,7 @@ export function TVShowSeasonsModalComponent(
                   </div>
                 )}
                 <div
-                  className={cx('btn', {
+                  className={cx('btn btn-success', {
                     disabled: isDownloadButtonDisabled,
                   })}
                   onClick={isDownloadButtonDisabled ? undefined : handleTrack}
