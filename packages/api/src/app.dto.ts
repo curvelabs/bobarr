@@ -28,6 +28,8 @@ export enum ParameterKey {
   MAX_MOVIE_DOWNLOAD_SIZE = 'max_movie_download_size',
   MAX_TVSHOW_EPISODE_DOWNLOAD_SIZE = 'max_tvshow_episode_download_size',
   ORGANIZE_LIBRARY_STRATEGY = 'organize_library_strategy',
+  ADMIN_PASSWORD = 'admin_password',
+  JWT_SECRET = 'jwt_secret',
 }
 
 export enum OrganizeLibraryStrategy {

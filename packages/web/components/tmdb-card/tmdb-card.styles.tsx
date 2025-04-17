@@ -22,23 +22,20 @@ export const TMDBCardStyles = styled.div`
     max-width: 100%;
     margin: 0 auto;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    background: #004e89;
 
-    .poster,
+    .poster-img {
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+    }
+
     .overlay {
       height: 330px;
       width: 100%;
       left: 0;
       top: 0;
       position: absolute;
-    }
-
-    .poster {
-      background: #004e89;
-      background-size: cover !important;
-      background-position: center !important;
-    }
-
-    .overlay {
       display: flex;
       background: rgba(0, 0, 0, 0.7);
       align-items: center;
@@ -86,6 +83,30 @@ export const TMDBCardStyles = styled.div`
       text-transform: uppercase;
       z-index: 1;
     }
+
+    .rating-badge {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.75);
+      color: white;
+      padding: 4px 8px;
+      font-weight: bold;
+      font-size: 0.9em;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      z-index: 2;
+
+      &.high-rating {
+        background: #47b872;
+        color: white;
+      }
+
+      &.low-rating {
+        background: #e23636;
+        color: white;
+      }
+    }
   }
 
   .name {
@@ -107,17 +128,6 @@ export const TMDBCardStyles = styled.div`
     padding: 0 10px;
   }
 
-  .vote--container {
-    position: absolute;
-    bottom: -18px;
-    left: 10px;
-    z-index: 2;
-    background: white;
-    border-radius: 50%;
-    padding: 2px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  }
-
   @media (max-width: 480px) {
     width: 170px;
 
@@ -125,7 +135,7 @@ export const TMDBCardStyles = styled.div`
       height: 255px;
       width: 170px;
 
-      .poster, .overlay {
+      .overlay {
         height: 255px;
       }
 
@@ -133,15 +143,15 @@ export const TMDBCardStyles = styled.div`
         font-size: 0.7em;
         padding: 2px 6px;
       }
+
+      .rating-badge {
+        font-size: 0.8em;
+        padding: 3px 6px;
+      }
     }
 
     .name {
       font-size: 1em;
-    }
-
-    .vote--container {
-      bottom: -15px;
-      left: 5px;
     }
   }
 `;

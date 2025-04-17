@@ -7,6 +7,7 @@ import {
   InMemoryCache,
   NormalizedCacheObject,
   HttpLink,
+  ApolloLink,
 } from '@apollo/client';
 
 import { apiURL } from '../utils/api-url';
@@ -17,10 +18,29 @@ let apolloClient: ApolloClient<NormalizedCacheObject>;
 const apolloClientCache = new InMemoryCache();
 
 function createApolloClient() {
+  const httpLink = new HttpLink({ uri: `${apiURL}/graphql` });
+
+  // Add authentication link
+  const authLink = new ApolloLink((operation, forward) => {
+    // Get the authentication token from local storage if it exists
+    const token = !isServer ? localStorage.getItem('authToken') : null;
+
+    // Add the authorization header to the request
+    if (token) {
+      operation.setContext({
+        headers: {
+          authorization: `Bearer ${token}`
+        }
+      });
+    }
+
+    return forward(operation);
+  });
+
   return new ApolloClient({
     ssrMode: isServer,
     connectToDevTools: !isServer,
-    link: new HttpLink({ uri: `${apiURL}/graphql` }),
+    link: authLink.concat(httpLink),
     cache: apolloClientCache,
     queryDeduplication: true,
   });

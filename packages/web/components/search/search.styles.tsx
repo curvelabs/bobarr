@@ -108,35 +108,35 @@ export const SearchStyles = styled.div`
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: thin;
-      
+
       &::-webkit-scrollbar {
         height: 6px;
       }
-      
+
       &::-webkit-scrollbar-track {
         background: #f1f1f1;
         border-radius: 10px;
       }
-      
+
       &::-webkit-scrollbar-thumb {
         background: #888;
         border-radius: 10px;
       }
     }
   }
-  
+
   .loading-more {
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 24px 0;
     color: #555;
-    
+
     span {
       margin-left: 10px;
     }
   }
-  
+
   .results-end-marker {
     height: 20px;
   }
@@ -146,16 +146,16 @@ export const SearchStyles = styled.div`
       &--title {
         font-size: 1.6em;
       }
-      
+
       &--subtitle {
         font-size: 1.2em;
         margin-bottom: 24px;
       }
-      
+
       &--input {
         height: 40px;
         font-size: 1em;
-        
+
         &-submit {
           height: 34px;
           width: 34px;
@@ -165,7 +165,7 @@ export const SearchStyles = styled.div`
         }
       }
     }
-    
+
     .search-results {
       &--category {
         margin-left: 0;

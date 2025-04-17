@@ -60,55 +60,55 @@ export class ParamsService {
     const defaultQualities: Array<
       Omit<Quality, 'id' | 'createdAt' | 'updatedAt'>
     > = [
-      {
-        type: Entertainment.Movie,
-        name: '4K',
-        match: ['uhd', '4k', '2160', '2160p'],
-        score: 4,
-      },
-      {
-        type: Entertainment.Movie,
-        name: '1440p',
-        match: ['1440', '1440p'],
-        score: 3,
-      },
-      {
-        type: Entertainment.Movie,
-        name: '1080p',
-        match: ['1080', '1080p'],
-        score: 2,
-      },
-      {
-        type: Entertainment.Movie,
-        name: '720p',
-        match: ['720', '720p'],
-        score: 1,
-      },
-      {
-        type: Entertainment.TvShow,
-        name: '4K',
-        match: ['uhd', '4k', '2160', '2160p'],
-        score: 4,
-      },
-      {
-        type: Entertainment.TvShow,
-        name: '1440p',
-        match: ['1440', '1440p'],
-        score: 3,
-      },
-      {
-        type: Entertainment.TvShow,
-        name: '1080p',
-        match: ['1080', '1080p'],
-        score: 2,
-      },
-      {
-        type: Entertainment.TvShow,
-        name: '720p',
-        match: ['720', '720p'],
-        score: 1,
-      },
-    ];
+        {
+          type: Entertainment.Movie,
+          name: '4K',
+          match: ['uhd', '4k', '2160', '2160p'],
+          score: 4,
+        },
+        {
+          type: Entertainment.Movie,
+          name: '1440p',
+          match: ['1440', '1440p'],
+          score: 3,
+        },
+        {
+          type: Entertainment.Movie,
+          name: '1080p',
+          match: ['1080', '1080p'],
+          score: 2,
+        },
+        {
+          type: Entertainment.Movie,
+          name: '720p',
+          match: ['720', '720p'],
+          score: 1,
+        },
+        {
+          type: Entertainment.TvShow,
+          name: '4K',
+          match: ['uhd', '4k', '2160', '2160p'],
+          score: 4,
+        },
+        {
+          type: Entertainment.TvShow,
+          name: '1440p',
+          match: ['1440', '1440p'],
+          score: 3,
+        },
+        {
+          type: Entertainment.TvShow,
+          name: '1080p',
+          match: ['1080', '1080p'],
+          score: 2,
+        },
+        {
+          type: Entertainment.TvShow,
+          name: '720p',
+          match: ['720', '720p'],
+          score: 1,
+        },
+      ];
 
     await map(defaultQualities, async (quality) => {
       const match = await qualityDAO.findOne({
@@ -134,6 +134,25 @@ export class ParamsService {
   public async getList(key: ParameterKey) {
     const param = await this.parameterDAO.findOne({ key });
     return param?.value ? param.value.split(',') : [];
+  }
+
+  /**
+   * Save or update a parameter by key
+   */
+  @Transaction()
+  public async save(
+    key: ParameterKey,
+    value: string,
+    @TransactionManager() manager?: EntityManager
+  ) {
+    const paramDAO = manager!.getCustomRepository(ParameterDAO);
+    const existingParam = await paramDAO.findOne({ key });
+
+    if (existingParam) {
+      return await paramDAO.update({ key }, { value });
+    } else {
+      return await paramDAO.save({ key, value });
+    }
   }
 
   public async getQualities(type?: Entertainment) {

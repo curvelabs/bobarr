@@ -41,12 +41,12 @@ export function SearchComponent() {
       const tvShows = popularQuery.data?.results?.tvShows || [];
       const combined = [];
       const maxLength = Math.max(movies.length, tvShows.length);
-      
+
       for (let i = 0; i < maxLength; i++) {
         if (movies[i]) combined.push({ ...movies[i], mediaType: 'movie' });
         if (tvShows[i]) combined.push({ ...tvShows[i], mediaType: 'tvshow' });
       }
-      
+
       return combined;
     }
   };
@@ -61,12 +61,12 @@ export function SearchComponent() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setSearchQuery(newValue);
-    
+
     // Clear any existing timeout
     if (searchTimeout) {
       clearTimeout(searchTimeout);
     }
-    
+
     // Only trigger search if there's actual input
     if (newValue && newValue.trim()) {
       // Add a delay before searching to wait until user finishes typing
@@ -80,7 +80,7 @@ export function SearchComponent() {
         window.scrollTo(0, 0);
         setPage(1);
       }, 700); // 700ms delay
-      
+
       setSearchTimeout(newTimeout);
     }
   };
@@ -143,24 +143,24 @@ export function SearchComponent() {
                 <div className="search-results--category">
                   {displaySearchResults ? 'Search Results' : 'Popular Titles'}
                 </div>
-                
+
                 <UnifiedResultsGrid>
                   {unifiedResults.slice(0, page * 20).map((result: any) => (
                     <div key={`${result.mediaType}-${result.id}`} className="result-item">
-                      <TMDBCardComponent 
-                        type={result.mediaType} 
+                      <TMDBCardComponent
+                        type={result.mediaType}
                         result={result}
                         inLibrary={false}
                       />
                     </div>
                   ))}
                 </UnifiedResultsGrid>
-                
+
                 <div ref={resultsEndRef} className="results-end-marker"></div>
-                
+
                 {loading && (
                   <div className="loading-more">
-                    <LoadingOutlined style={{ fontSize: 24 }} spin /> 
+                    <LoadingOutlined style={{ fontSize: 24 }} spin />
                     <span>Loading more results...</span>
                   </div>
                 )}

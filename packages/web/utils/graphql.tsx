@@ -287,6 +287,13 @@ export type OmdbInfo = {
   ratings: Ratings;
 };
 
+export type AuthenticationResult = {
+  __typename?: 'AuthenticationResult';
+  success: Scalars['Boolean'];
+  token?: Maybe<Scalars['String']>;
+  message?: Maybe<Scalars['String']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   getQualityParams: Array<Quality>;
@@ -312,6 +319,7 @@ export type Query = {
   getCalendar: LibraryCalendar;
   getMovieFileDetails: LibraryFileDetails;
   omdbSearch: OmdbInfo;
+  validateToken: Scalars['Boolean'];
 };
 
 
@@ -365,6 +373,11 @@ export type QueryOmdbSearchArgs = {
   title: Scalars['String'];
 };
 
+
+export type QueryValidateTokenArgs = {
+  token: Scalars['String'];
+};
+
 export type GetTorrentStatusInput = {
   resourceId: Scalars['Int'];
   resourceType: FileType;
@@ -388,6 +401,7 @@ export type Mutation = {
   removeTVShow: GraphQlCommonResponse;
   resetLibrary: GraphQlCommonResponse;
   downloadOwnTorrent: GraphQlCommonResponse;
+  authenticate: AuthenticationResult;
 };
 
 
@@ -459,6 +473,11 @@ export type MutationDownloadOwnTorrentArgs = {
   mediaId: Scalars['Int'];
 };
 
+
+export type MutationAuthenticateArgs = {
+  input: AuthenticateInput;
+};
+
 export type QualityInput = {
   id: Scalars['Float'];
   score: Scalars['Float'];
@@ -480,6 +499,23 @@ export type JackettInput = {
   quality: Scalars['String'];
   tag: Scalars['String'];
 };
+
+export type AuthenticateInput = {
+  password: Scalars['String'];
+};
+
+export type AuthenticateMutationVariables = Exact<{
+  input: AuthenticateInput;
+}>;
+
+
+export type AuthenticateMutation = (
+  { __typename?: 'Mutation' }
+  & { authenticate: (
+    { __typename?: 'AuthenticationResult' }
+    & Pick<AuthenticationResult, 'success' | 'token' | 'message'>
+  ) }
+);
 
 export type ClearCacheMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -996,6 +1032,16 @@ export type SearchQuery = (
   ) }
 );
 
+export type ValidateTokenQueryVariables = Exact<{
+  token: Scalars['String'];
+}>;
+
+
+export type ValidateTokenQuery = (
+  { __typename?: 'Query' }
+  & Pick<Query, 'validateToken'>
+);
+
 export const MissingTvEpisodesFragmentDoc = gql`
     fragment MissingTVEpisodes on EnrichedTVEpisode {
   id
@@ -1015,6 +1061,21 @@ export const MissingMoviesFragmentDoc = gql`
   releaseDate
 }
     `;
+export const AuthenticateDocument = gql`
+    mutation Authenticate($input: AuthenticateInput!) {
+  authenticate(input: $input) {
+    success
+    token
+    message
+  }
+}
+    `;
+export function useAuthenticateMutation(baseOptions?: Apollo.MutationHookOptions<AuthenticateMutation, AuthenticateMutationVariables>) {
+        return Apollo.useMutation<AuthenticateMutation, AuthenticateMutationVariables>(AuthenticateDocument, baseOptions);
+      }
+export type AuthenticateMutationHookResult = ReturnType<typeof useAuthenticateMutation>;
+export type AuthenticateMutationResult = Apollo.MutationResult<AuthenticateMutation>;
+export type AuthenticateMutationOptions = Apollo.BaseMutationOptions<AuthenticateMutation, AuthenticateMutationVariables>;
 export const ClearCacheDocument = gql`
     mutation clearCache {
   result: clearRedisCache {
@@ -1765,3 +1826,17 @@ export function useSearchLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Sea
 export type SearchQueryHookResult = ReturnType<typeof useSearchQuery>;
 export type SearchLazyQueryHookResult = ReturnType<typeof useSearchLazyQuery>;
 export type SearchQueryResult = Apollo.QueryResult<SearchQuery, SearchQueryVariables>;
+export const ValidateTokenDocument = gql`
+    query ValidateToken($token: String!) {
+  validateToken(token: $token)
+}
+    `;
+export function useValidateTokenQuery(baseOptions: Apollo.QueryHookOptions<ValidateTokenQuery, ValidateTokenQueryVariables>) {
+        return Apollo.useQuery<ValidateTokenQuery, ValidateTokenQueryVariables>(ValidateTokenDocument, baseOptions);
+      }
+export function useValidateTokenLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ValidateTokenQuery, ValidateTokenQueryVariables>) {
+          return Apollo.useLazyQuery<ValidateTokenQuery, ValidateTokenQueryVariables>(ValidateTokenDocument, baseOptions);
+        }
+export type ValidateTokenQueryHookResult = ReturnType<typeof useValidateTokenQuery>;
+export type ValidateTokenLazyQueryHookResult = ReturnType<typeof useValidateTokenLazyQuery>;
+export type ValidateTokenQueryResult = Apollo.QueryResult<ValidateTokenQuery, ValidateTokenQueryVariables>;

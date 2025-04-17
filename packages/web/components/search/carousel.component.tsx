@@ -38,7 +38,7 @@ export function CarouselComponent({
     function handleResize() {
       setWindowWidth(window.innerWidth);
     }
-    
+
     if (typeof window !== 'undefined') {
       window.addEventListener('resize', handleResize);
       handleResize();

@@ -43,11 +43,11 @@ export function TVSeasonDetailsComponent({
   // Custom function to display release dates in a user-friendly format
   const formatReleaseDate = (date: string | null) => {
     if (!date) return 'Unknown date';
-    
+
     const releaseDate = dayjs(date);
     const now = dayjs();
     const daysUntilRelease = releaseDate.diff(now, 'day');
-    
+
     if (daysUntilRelease > 0) {
       return `Coming in ${daysUntilRelease} days`;
     } else if (daysUntilRelease === 0) {

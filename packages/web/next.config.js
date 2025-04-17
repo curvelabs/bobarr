@@ -21,4 +21,31 @@ module.exports = {
       },
     ];
   },
+  // // Configuration for development server
+  // serverRuntimeConfig: {
+  //   // Will only be available on the server side
+  // },
+  // publicRuntimeConfig: {
+  //   // Will be available on both server and client
+  // },
+  // // Enhanced development configuration
+  // devIndicators: {
+  //   buildActivity: true,
+  // },
+  // // Add server configuration to listen on all interfaces with HMR
+  // webpack5: true,
+  // webpack: (config) => {
+  //   // Add HMR related configurations
+  //   config.optimization.minimize = false;
+  //   return config;
+  // },
+  // webpackHotMiddleware: {
+  //   // Enable client-side hot module reloading
+  //   overlay: true,
+  // },
+  // // Server settings for docker environment
+  // server: {
+  //   host: 'localhost',
+  //   port: 3000
+  // }
 };

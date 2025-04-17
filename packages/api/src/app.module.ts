@@ -17,6 +17,7 @@ import { RedisModule } from 'src/modules/redis/redis.module';
 import { HealthController } from 'src/modules/health/health.controller';
 import { ImageCacheModule } from 'src/modules/image-cache/image-cache.module';
 import { OMDBModule } from './modules/omdb/omdb.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -40,8 +41,9 @@ import { OMDBModule } from './modules/omdb/omdb.module';
     TransmissionModule,
     RedisModule,
     ImageCacheModule,
+    AuthModule,
   ],
   controllers: [HealthController],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

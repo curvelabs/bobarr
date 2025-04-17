@@ -25,7 +25,7 @@ export const SettingsComponentStyles = styled.div`
     .ant-card {
       margin-bottom: 24px;
     }
-    
+
     .ant-btn {
       display: block;
       margin-bottom: 12px;
@@ -54,10 +54,10 @@ export const SettingsComponentStyles = styled.div`
       margin-top: 16px;
     }
   }
-  
+
   .tags-container {
     margin-top: 24px;
-    
+
     .ant-tag {
       margin-bottom: 8px;
       font-size: 14px;
@@ -75,11 +75,11 @@ export const SettingsComponentStyles = styled.div`
 
   @media (max-width: 768px) {
     padding-top: 32px;
-    
+
     .ant-card-body {
       padding: 16px;
     }
-    
+
     .ant-form-item {
       margin-bottom: 16px;
     }

@@ -58,10 +58,10 @@ export function NavbarComponent() {
         </button>
         <div className="region-select">{data?.params?.region || 'US'}</div>
       </div>
-      
+
       {/* Overlay that dims the screen and allows clicking outside to close menu */}
-      <div 
-        className={`overlay ${menuOpen ? 'open' : ''}`} 
+      <div
+        className={`overlay ${menuOpen ? 'open' : ''}`}
         onClick={closeMenu}
       />
 

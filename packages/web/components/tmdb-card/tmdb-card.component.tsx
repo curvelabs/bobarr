@@ -26,6 +26,9 @@ export function TMDBCardComponent(props: TMDBCardComponentProps) {
   const { result, type, inLibrary } = props;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const posterPath = result.posterPath || '';
+  const hasHighRating = result.voteAverage >= 7.5;
+  const hasLowRating = result.voteAverage <= 4.5;
+  const showRating = hasHighRating || hasLowRating;
 
   return (
     <TMDBCardStyles>
@@ -54,23 +57,25 @@ export function TMDBCardComponent(props: TMDBCardComponentProps) {
         <div className="media-type-badge">
           {type === 'movie' ? 'Movie' : 'TV'}
         </div>
-        
-        <div
-          className="poster"
-          style={{
-            backgroundImage: posterPath ? 
-              `url(${getImageURL(`w500_and_h750_face${posterPath}`)})` : 
-              'none'
-          }}
+
+        {/* Use actual img instead of background-image for better compatibility */}
+        <img
+          src={posterPath ? getImageURL(`w500_and_h750_face${posterPath}`) : '/assets/poster-placeholder.png'}
+          alt={result.title}
+          className="poster-img"
         />
+
         <div className="overlay">
-          <>
-            <FolderOpenOutlined />
-            <div className="action-label">View Details</div>
-          </>
+          <FolderOpenOutlined />
+          <div className="action-label">View Details</div>
         </div>
-        
-        <RatingComponent rating={result.voteAverage * 10} />
+
+        {/* Only show rating badge for exceptional ratings */}
+        {showRating && (
+          <div className={`rating-badge ${hasHighRating ? 'high-rating' : 'low-rating'}`}>
+            {Math.round(result.voteAverage * 10)}%
+          </div>
+        )}
       </div>
 
       <div className="name">{result.title}</div>

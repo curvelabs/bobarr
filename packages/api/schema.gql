@@ -253,6 +253,12 @@ type OMDBInfo {
   ratings: Ratings!
 }
 
+type AuthenticationResult {
+  success: Boolean!
+  token: String
+  message: String
+}
+
 type Query {
   getQualityParams(type: Entertainment!): [Quality!]!
   getTags: [Tag!]!
@@ -277,6 +283,7 @@ type Query {
   getCalendar: LibraryCalendar!
   getMovieFileDetails(tmdbId: Int!): LibraryFileDetails!
   omdbSearch(title: String!): OMDBInfo!
+  validateToken(token: String!): Boolean!
 }
 
 input GetTorrentStatusInput {
@@ -301,6 +308,7 @@ type Mutation {
   removeTVShow(tmdbId: Int!): GraphQLCommonResponse!
   resetLibrary(resetSettings: Boolean!, deleteFiles: Boolean!): GraphQLCommonResponse!
   downloadOwnTorrent(torrent: String!, mediaType: FileType!, mediaId: Int!): GraphQLCommonResponse!
+  authenticate(input: AuthenticateInput!): AuthenticationResult!
 }
 
 input QualityInput {
@@ -323,4 +331,8 @@ input JackettInput {
   downloadLink: String!
   quality: String!
   tag: String!
+}
+
+input AuthenticateInput {
+  password: String!
 }

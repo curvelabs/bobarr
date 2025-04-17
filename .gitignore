@@ -36,3 +36,5 @@ packages/transmission/config/settings.json
 
 _node_modules
 node_modules
+
+.env

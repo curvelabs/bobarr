@@ -6,6 +6,8 @@ export const MovieDetailsStyles = styled.div`
   max-height: 85vh;
   position: relative;
   animation: modalFadeIn 0.3s ease-in-out;
+  border-radius: 8px;
+  overflow: hidden;
 
   @keyframes modalFadeIn {
     from {
@@ -35,21 +37,20 @@ export const MovieDetailsStyles = styled.div`
     top: 12px;
     right: 12px;
     z-index: 999;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s ease;
-
-    &:hover {
-      background: rgba(0, 0, 0, 0.8);
-    }
+    transition: all 0.2s ease;
 
     svg {
-      font-size: 1.2em;
+      font-size: 1.4em;
+      filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
+    }
+
+    &:hover {
+      transform: scale(1.1);
     }
   }
 
@@ -73,7 +74,7 @@ export const MovieDetailsStyles = styled.div`
     &.btn-success {
       background: rgba(76, 175, 80, 0.7);
       border-color: rgba(76, 175, 80, 0.3);
-      
+
       &:hover {
         background: rgba(76, 175, 80, 0.9);
       }
@@ -82,7 +83,7 @@ export const MovieDetailsStyles = styled.div`
     &.btn-danger {
       background: rgba(244, 67, 54, 0.7);
       border-color: rgba(244, 67, 54, 0.3);
-      
+
       &:hover {
         background: rgba(244, 67, 54, 0.9);
       }
@@ -99,8 +100,6 @@ export const MovieDetailsStyles = styled.div`
   }
 
   .header-container {
-    border-radius: 8px;
-    overflow: hidden;
     position: relative;
     height: 100%;
     width: 100%;
@@ -243,7 +242,7 @@ export const MovieDetailsStyles = styled.div`
 
   @media (max-width: 768px) {
     max-height: 85vh;
-    
+
     .header-content {
       flex-direction: column;
       padding: 20px 16px;
