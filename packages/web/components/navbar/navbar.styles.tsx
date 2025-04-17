@@ -69,4 +69,44 @@ export const NavbarStyles = styled.div`
       color: ${({ theme }) => theme.colors.navbarBackground};
     }
   }
+.hamburger {
+    display: none;
+    cursor: pointer;
+  }
+
+  @media (max-width: 768px) {
+    .wrapper {
+      margin: 0 16px;
+      justify-content: space-between;
+    }
+    .links,
+    .region-select {
+      display: none;
+    }
+    .hamburger {
+      display: block;
+    }
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      position: fixed;
+      top: ${({ theme }) =&gt; theme.navbarHeight}px;
+      left: 0;
+      width: 100vw;
+      height: calc(100vh - ${({ theme }) =&gt; theme.navbarHeight}px);
+      background: ${({ theme }) =&gt; theme.colors.navbarBackground};
+      padding: 16px;
+      overflow-y: auto;
+      z-index: 2;
+    }
+    .mobile-menu a {
+      color: #fff;
+      margin-bottom: 12px;
+      font-size: 1.2em;
+      text-decoration: none;
+    }
+    .mobile-menu.open {
+      display: flex;
+    }
+  }
 `;

@@ -5,6 +5,8 @@ import { useRouter } from 'next/router';
 
 import { useGetParamsQuery } from '../../utils/graphql';
 import { NavbarStyles } from './navbar.styles';
+import { useState } from 'react';
+import { FaBars, FaTimes } from 'react-icons/fa';
 
 const links = [
   ['Movies', '/library/movies'],
@@ -19,6 +21,7 @@ const links = [
 export function NavbarComponent() {
   const router = useRouter();
   const { data } = useGetParamsQuery();
+const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <NavbarStyles>
@@ -31,8 +34,32 @@ export function NavbarComponent() {
             </Link>
           ))}
         </div>
+<button
+              className="hamburger"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              {menuOpen ? &lt;FaTimes /&gt; : &lt;FaBars /&gt;}
+            </button>
         <div className="region-select">{data?.params?.region || 'US'}</div>
       </div>
+<div className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
+  {links.map(([name, url]) => (
+    <Link key={url} href={url} passHref>
+      <a
+        className={cx({ active: url === router.pathname })}
+        onClick={() => setMenuOpen(false)}
+      >
+        {name}
+      </a>
+    </Link>
+  ))}
+  <div
+    className="region-select"
+    onClick={() => setMenuOpen(false)}
+  >
+    {data?.params?.region || 'US'}
+  </div>
+</div>
     </NavbarStyles>
   );
 }

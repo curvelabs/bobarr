@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "yarn && yarn concurrently yarn:watch-*",
-    "watch-next": "next dev",
+    "watch-next": "next dev --hostname 0.0.0.0 --port 53270",
     "watch-gql": "gql-gen --watch",
     "build": "next build",
-    "start": "next start",
+    "start": "next start --hostname 0.0.0.0 --port 53270",
     "gql-gen": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
