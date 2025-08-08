@@ -20,6 +20,7 @@ import {
   SearchingMedia,
   LibraryCalendar,
   LibraryFileDetails,
+  MediaInfosInput,
 } from './library.dto';
 
 import { makeCacheInterceptor } from '../redis/cache.interceptor';
@@ -102,12 +103,31 @@ export class LibraryResolver {
   }
 
   @Mutation((_returns) => GraphQLCommonResponse)
+  public async downloadMovieFromResult(
+    @Args('movieTMDBId', { type: () => Int }) movieTMDBId: number,
+    @Args('jackettResult', { type: () => JackettInput })
+    jackettResult: JackettInput
+  ) {
+    await this.libraryService.downloadMovieFromResult(
+      movieTMDBId,
+      jackettResult,
+      null
+    );
+    return { success: true, message: 'MOVIE_DOWNLOAD_STARTED' };
+  }
+
+  @Mutation((_returns) => GraphQLCommonResponse)
   public async downloadSeason(
     @Args('tvShowTMDBId', { type: () => Int }) tvShowTMDBId: number,
     @Args('seasonNumber', { type: () => Int }) seasonNumber: number,
     @Args('jackettResult', { type: () => JackettInput })
     jackettResult: JackettInput
   ) {
+    await this.libraryService.trackTVShowWithoutDownload({
+      tmdbId: tvShowTMDBId,
+      seasonNumbers: [seasonNumber],
+    });
+
     const { seasons } = await this.tvShowDAO
       .createQueryBuilder('tvShow')
       .innerJoinAndSelect(
@@ -192,12 +212,21 @@ export class LibraryResolver {
   public async downloadOwnTorrent(
     @Args('mediaId', { type: () => Int }) mediaId: number,
     @Args('mediaType', { type: () => FileType }) mediaType: FileType,
-    @Args('torrent') torrent: string
+    @Args('torrent') torrent: string,
+    @Args('mediaInfos') mediaInfos: MediaInfosInput
   ) {
     await this.libraryService.downloadOwnTorrent(
-      { mediaId, mediaType, torrent },
+      { mediaId, mediaType, torrent, mediaInfos },
       null
     );
     return { success: true, message: 'DOWNLOAD_STARTED' };
+  }
+
+  @Mutation((_returns) => GraphQLCommonResponse)
+  public async skipMissingEpisode(
+    @Args('mediaId', { type: () => Int }) mediaId: number
+  ) {
+    await this.libraryService.skipMissingEpisode({ mediaId }, null);
+    return { success: true, message: 'MEDIA_SKIPED' };
   }
 }

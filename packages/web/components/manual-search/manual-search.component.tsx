@@ -56,7 +56,7 @@ export function ManualSearchComponent(props: ManualSearchProps) {
     onCompleted: () => {
       handleClose();
       notification.success({
-        message: 'Download episode started',
+        message: 'Download started',
         placement: 'bottomRight',
       });
     },
@@ -70,15 +70,43 @@ export function ManualSearchComponent(props: ManualSearchProps) {
 
     if (file && props.media.id) {
       const base64 = await toBase64(file);
+
+      let movieTMDBId = 0;
+      let tvShowTMDBId = 0;
+      let seasonNumber = 0;
+      let episodeNumber = 0;
+
+      let mediaType = FileType.Movie;
+      if (props.media.__typename === 'TMDBSearchResult') {
+        mediaType = FileType.Movie;
+        movieTMDBId = props.media.movieTMDBId;
+      } else if (props.media.__typename === 'TMDBFormattedTVSeason') {
+        mediaType = FileType.Season;
+        tvShowTMDBId = props.media.tvShowTMDBId;
+        seasonNumber = props.media.seasonNumber!;
+      } else if (props.media.__typename === 'EnrichedTVEpisode') {
+        mediaType = FileType.Episode;
+        tvShowTMDBId = props.media.tvShow.id;
+        seasonNumber = props.media.seasonNumber!;
+        episodeNumber = props.media.episodeNumber!;
+      }
+
       await downloadOwnTorrent({
         variables: {
           mediaId: props.media.id,
-          mediaType:
-            props.media.__typename === 'EnrichedTVEpisode'
-              ? FileType.Episode
-              : FileType.Movie,
+          mediaType,
           torrent: base64,
+          mediaInfos: {
+            movieTMDBId,
+            tvShowTMDBId,
+            seasonNumber,
+            episodeNumber,
+          },
         },
+      });
+    } else {
+      notification.error({
+        message: 'No file selected',
       });
     }
 
@@ -88,7 +116,16 @@ export function ManualSearchComponent(props: ManualSearchProps) {
   const handlePasteMagnetLink = async () => {
     setUploadTorrentLoading(true);
 
-    const magnetLink = await navigator.clipboard.readText();
+    let magnetLink: string | null = null;
+
+    try {
+      magnetLink = await navigator.clipboard.readText();
+    } catch (err) {
+      setUploadTorrentLoading(false);
+      return notification.error({
+        message: 'Error reading your clipboard',
+      });
+    }
 
     if (typeof magnetLink !== 'string' || !magnetLink.startsWith('magnet:')) {
       setUploadTorrentLoading(false);
@@ -98,14 +135,24 @@ export function ManualSearchComponent(props: ManualSearchProps) {
     }
 
     if (props.media.id) {
+      let mediaType = FileType.Movie;
+      if (props.media.__typename === 'TMDBFormattedTVSeason') {
+        mediaType = FileType.Season;
+      } else if (props.media.__typename === 'EnrichedTVEpisode') {
+        mediaType = FileType.Episode;
+      }
+
       await downloadOwnTorrent({
         variables: {
           mediaId: props.media.id,
-          mediaType:
-            props.media.__typename === 'EnrichedTVEpisode'
-              ? FileType.Episode
-              : FileType.Movie,
+          mediaType,
           torrent: magnetLink,
+          mediaInfos: {
+            movieTMDBId: 0,
+            tvShowTMDBId: 0,
+            seasonNumber: 0,
+            episodeNumber: 0,
+          },
         },
       });
     }
@@ -121,6 +168,7 @@ export function ManualSearchComponent(props: ManualSearchProps) {
   return (
     <Modal
       visible={true}
+      maskClosable={true}
       destroyOnClose={true}
       onCancel={handleClose}
       centered={true}
@@ -148,7 +196,11 @@ export function ManualSearchComponent(props: ManualSearchProps) {
           <Button
             type="primary"
             className="action-btn"
-            onClick={() => $fileInput.current?.click()}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              $fileInput.current?.click();
+            }}
             loading={isUploadTorrentLoading}
             disabled={isUploadTorrentLoading}
           >
@@ -158,6 +210,8 @@ export function ManualSearchComponent(props: ManualSearchProps) {
             type="primary"
             className="action-btn"
             onClick={handlePasteMagnetLink}
+            loading={isUploadTorrentLoading}
+            disabled={isUploadTorrentLoading}
           >
             Paste magnet link
           </Button>

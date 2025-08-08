@@ -30,4 +30,39 @@ export class TransmissionResolver {
       return { ...torrentStatus, resourceId, resourceType };
     });
   }
+
+  @Query((_returns) => [TorrentStatus])
+  public async getMultiTorrentStatus(
+    @Args('torrents', { type: () => [GetTorrentStatusInput] })
+    torrents: GetTorrentStatusInput[]
+  ) {
+    const torrentStatuses = await map(
+      torrents,
+      async ({ resourceId, resourceType }) => {
+        const torrent = await this.torrentDAO.findOneOrFail({
+          where: { resourceId, resourceType },
+        });
+
+        return { torrent, resourceId, resourceType };
+      }
+    );
+
+    const torrentHashes = torrentStatuses.map((t) => t.torrent.torrentHash);
+
+    const {
+      torrents: torrentInfos,
+    } = await this.transmissionService.getTorrents(torrentHashes);
+
+    return torrentStatuses.map((torrentStatus) => {
+      const torrentInfo = torrentInfos.find(
+        (ti) => ti.hashString === torrentStatus.torrent.torrentHash
+      );
+
+      return {
+        ...torrentInfo,
+        resourceId: torrentStatus.resourceId,
+        resourceType: torrentStatus.resourceType,
+      };
+    });
+  }
 }

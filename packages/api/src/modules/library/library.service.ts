@@ -31,7 +31,7 @@ import { JobsService } from 'src/modules/jobs/jobs.service';
 import { TransmissionService } from 'src/modules/transmission/transmission.service';
 import { ParamsService } from 'src/modules/params/params.service';
 
-import { JackettInput } from './library.dto';
+import { JackettInput, MediaInfosInput } from './library.dto';
 import { FileDAO } from 'src/entities/dao/file.dao';
 
 @Injectable()
@@ -108,6 +108,12 @@ export class LibraryService {
     this.logger.info('track movie', { tmdbId: movieAttributes.tmdbId });
     const movie = await this.movieDAO.save(movieAttributes);
     await this.jobsService.startDownloadMovie(movie.id);
+    return movie;
+  }
+
+  public async trackMovieWithoutDownload(movieAttributes: DeepPartial<Movie>) {
+    this.logger.info('track movie', { tmdbId: movieAttributes.tmdbId });
+    const movie = await this.movieDAO.save(movieAttributes);
     return movie;
   }
 
@@ -340,6 +346,40 @@ export class LibraryService {
   }
 
   @LazyTransaction()
+  public async downloadMovieFromResult(
+    movieTMDBId: number,
+    jackettResult: JackettInput,
+    @TransactionManager() manager: EntityManager | null
+  ) {
+    const movieResult = await this.tmdbService.getMovie(movieTMDBId);
+    const movie = await this.trackMovieWithoutDownload({
+      title: movieResult.title,
+      tmdbId: movieTMDBId,
+    });
+
+    await this.replaceMovie(movie.id, manager!);
+
+    const torrent = await this.transmissionService.addTorrent(
+      {
+        torrent: jackettResult.downloadLink,
+        torrentType: 'url',
+        torrentAttributes: {
+          resourceType: FileType.MOVIE,
+          resourceId: movie.id,
+          quality: jackettResult.quality,
+          tag: jackettResult.tag,
+        },
+      },
+      manager
+    );
+
+    this.logger.info('download movie started', {
+      movieId: movie.id,
+      torrent: torrent.id,
+    });
+  }
+
+  @LazyTransaction()
   public async downloadTVSeason(
     seasonId: number,
     jackettResult: JackettInput,
@@ -419,6 +459,23 @@ export class LibraryService {
     await forEachSeries(missingSeasons, (season) =>
       this.jobsService.startDownloadSeason(season.id)
     );
+
+    return tvShow;
+  }
+
+  public async trackTVShowWithoutDownload({
+    tmdbId,
+    seasonNumbers,
+  }: {
+    tmdbId: number;
+    seasonNumbers: number[];
+  }) {
+    this.logger.info('track tv show', { tmdbId });
+
+    const { tvShow } = await this.trackMissingSeasons({
+      tmdbId,
+      seasonNumbers,
+    });
 
     return tvShow;
   }
@@ -559,26 +616,43 @@ export class LibraryService {
       mediaId,
       mediaType,
       torrent,
+      mediaInfos,
     }: {
       mediaId: number;
       mediaType: FileType;
       torrent: string;
+      mediaInfos: MediaInfosInput;
     },
     @TransactionManager() manager: EntityManager | null
   ) {
     this.logger.info('start download own torrent', { mediaId, mediaType });
 
-    const baseOpts = {
-      torrent,
-      torrentType: torrent.startsWith('magnet') ? 'url' : 'base64',
-      torrentAttributes: {
-        resourceId: mediaId,
-        resourceType: mediaType,
-      },
-    } as const;
+    let finalMediaId = mediaId;
 
     if (mediaType === FileType.SEASON) {
-      await this.replaceSeason(mediaId, manager!);
+      await this.trackTVShowWithoutDownload({
+        tmdbId: mediaInfos.tvShowTMDBId,
+        seasonNumbers: [mediaInfos.seasonNumber],
+      });
+
+      const { seasons } = await this.tvShowDAO
+        .createQueryBuilder('tvShow')
+        .innerJoinAndSelect(
+          'tvShow.seasons',
+          'season',
+          'season.seasonNumber = :seasonNumber',
+          { seasonNumber: mediaInfos.seasonNumber }
+        )
+        .where('tvShow.tmdbId = :tvShowTMDBId', {
+          tvShowTMDBId: mediaInfos.tvShowTMDBId,
+        })
+        .getOneOrFail();
+
+      const [{ id: seasonId }] = seasons;
+
+      await this.replaceSeason(seasonId, manager!);
+
+      finalMediaId = seasonId;
     }
 
     if (mediaType === FileType.EPISODE) {
@@ -586,8 +660,31 @@ export class LibraryService {
     }
 
     if (mediaType === FileType.MOVIE) {
-      await this.replaceMovie(mediaId, manager!);
+      if (mediaInfos.movieTMDBId > 0) {
+        const movieResult = await this.tmdbService.getMovie(
+          mediaInfos.movieTMDBId
+        );
+        const movie = await this.trackMovieWithoutDownload({
+          title: movieResult.title,
+          tmdbId: mediaInfos.movieTMDBId,
+        });
+
+        await this.replaceMovie(movie.id, manager!);
+
+        finalMediaId = movie.id;
+      } else {
+        await this.replaceMovie(mediaId, manager!);
+      }
     }
+
+    const baseOpts = {
+      torrent,
+      torrentType: torrent.startsWith('magnet') ? 'url' : 'base64',
+      torrentAttributes: {
+        resourceId: finalMediaId,
+        resourceType: mediaType,
+      },
+    } as const;
 
     const torrentEntity = await this.transmissionService.addTorrent(
       baseOpts,
@@ -598,6 +695,27 @@ export class LibraryService {
       mediaId,
       mediaType,
       torrentId: torrentEntity.id,
+    });
+  }
+
+  @LazyTransaction()
+  public async skipMissingEpisode(
+    {
+      mediaId,
+    }: {
+      mediaId: number;
+    },
+    @TransactionManager() manager: EntityManager | null
+  ) {
+    this.logger.info('skip missing media', { mediaId });
+
+    const tvEpisodeDAO = manager!.getCustomRepository(TVEpisodeDAO);
+
+    const tvEpisode = await tvEpisodeDAO.findOneOrFail({ id: mediaId });
+
+    await tvEpisodeDAO.save({
+      id: tvEpisode.id,
+      state: DownloadableMediaState.SKIPPED,
     });
   }
 
@@ -629,6 +747,19 @@ export class LibraryService {
           this.logger.info('episode torrent removed', { torrent: torrent.id });
         }
       });
+
+      const torrent = await torrentDAO.findOne({
+        resourceId: seasonId,
+        resourceType: FileType.SEASON,
+      });
+
+      if (torrent) {
+        await torrentDAO.remove(torrent);
+        await this.transmissionService.removeTorrentAndFiles(
+          torrent.torrentHash
+        );
+        this.logger.info('season torrent removed', { torrent: torrent.id });
+      }
 
       const tvSeasonFolders = uniq(
         flatten(
@@ -730,15 +861,22 @@ export class LibraryService {
   };
 
   private enrichTVEpisode = async (tvEpisode: TVEpisode) => {
-    const tmdbResult = await this.tmdbService.getTVEpisode(
-      tvEpisode.tvShow.tmdbId,
-      tvEpisode.seasonNumber,
-      tvEpisode.episodeNumber
-    );
+    try {
+      const tmdbResult = await this.tmdbService.getTVEpisode(
+        tvEpisode.tvShow.tmdbId,
+        tvEpisode.seasonNumber,
+        tvEpisode.episodeNumber
+      );
 
-    return {
-      ...tvEpisode,
-      releaseDate: tmdbResult.air_date,
-    };
+      return {
+        ...tvEpisode,
+        releaseDate: tmdbResult.air_date ?? '1901-01-01',
+      };
+    } catch (e) {
+      return {
+        ...tvEpisode,
+        releaseDate: '1901-01-01',
+      };
+    }
   };
 }

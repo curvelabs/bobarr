@@ -133,13 +133,18 @@ export class OrganizeProcessor {
       folderName
     );
 
+    const downloadsFolder = path.resolve(
+      __dirname,
+      `../../../../../../library/downloads/complete`
+    );
+
     await childCommand(`mkdir -p "${newFolder}"`);
     await mapSeries(torrentFiles, async (torrentFile) => {
       await childCommand(
         oneLine`
             cd "${newFolder}" &&
             ${this.getOrganizeStrategyCommand(organizeStrategy)}
-              "../../downloads/complete/${torrentFile.original}"
+              "${downloadsFolder}/${torrentFile.original}"
               "${torrentFile.next}"
           `
       );
@@ -206,6 +211,11 @@ export class OrganizeProcessor {
       `Season ${seasonNb}`
     );
 
+    const downloadsFolder = path.resolve(
+      __dirname,
+      `../../../../../../library/downloads/complete`
+    );
+
     const torrentFiles = torrent.transmissionTorrent.files
       .filter((file) => {
         const ext = path.extname(file.name);
@@ -227,13 +237,13 @@ export class OrganizeProcessor {
         oneLine`
           cd "${seasonFolder}" &&
           ${this.getOrganizeStrategyCommand(organizeStrategy)}
-            "../../../downloads/complete/${torrentFile.original}"
+            "${downloadsFolder}/${torrentFile.original}"
             "${torrentFile.next}"
         `
       );
 
       await fileDAO.save({
-        episodeId,
+        tvEpisodeId: episodeId,
         path: path.join(seasonFolder, torrentFile.next),
       });
     });
@@ -294,6 +304,11 @@ export class OrganizeProcessor {
       `Season ${seasonNb}`
     );
 
+    const downloadsFolder = path.resolve(
+      __dirname,
+      `../../../../../../library/downloads/complete`
+    );
+
     const torrentFiles = torrent.transmissionTorrent.files.reduce(
       (
         results: Array<{
@@ -307,13 +322,32 @@ export class OrganizeProcessor {
         const ext = path.extname(file.name);
         const fileName = path.basename(file.name.toUpperCase());
 
-        const [, episodeNb1] = /S\d+ ?E(\d+)/.exec(fileName) || []; // Foobar_S01E01.mkv
+        const [, episodeNb1] = /S\d+\W?E(\d+)/.exec(fileName) || []; // Foobar_S01E01.mkv
         const [, episodeNb2] = /\d+X(\d+)/.exec(fileName) || []; // Foobar_1x01.mkv
-        const episodeNb = episodeNb1 || episodeNb2;
+        const [, episodeNb3] =
+          /(?:^|(?:[^a-zA-Z0-9]))(\d{2,3})(?:$|(?:[^a-zA-Z0-9]))/.exec(
+            fileName
+          ) || []; // ... 005 ...
+        const episodeNb = episodeNb1 || episodeNb2 || episodeNb3;
 
         const [, part] = /part ?(\d+)/.exec(fileName.toLowerCase()) || []; // Foobar_S01E01_Part1
 
-        if (episodeNb && allowedExtensions.includes(ext.replace(/^\./, ''))) {
+        let duplicated = false;
+        if (episodeNb) {
+          for (const res of results) {
+            if (res.episodeNb === parseInt(episodeNb, 10)) {
+              duplicated = true;
+
+              break;
+            }
+          }
+        }
+
+        if (
+          !duplicated &&
+          episodeNb &&
+          allowedExtensions.includes(ext.replace(/^\./, ''))
+        ) {
           return [
             ...results,
             {
@@ -336,7 +370,7 @@ export class OrganizeProcessor {
         files: torrent.transmissionTorrent.files,
       });
 
-      throw new Error('could not find any files in torrent');
+      // throw new Error('could not find any files in torrent');
     }
 
     await childCommand(`mkdir -p "${seasonFolder}"`);
@@ -354,7 +388,7 @@ export class OrganizeProcessor {
         oneLine`
           cd "${seasonFolder}" &&
           ${this.getOrganizeStrategyCommand(organizeStrategy)}
-          "../../../downloads/complete/${file.original}"
+          "${downloadsFolder}/${file.original}"
           "${newName}${file.ext}"
         `
       );
@@ -364,10 +398,20 @@ export class OrganizeProcessor {
       );
 
       if (episode) {
-        await fileDAO.save({
-          episodeId: episode.id,
+        const exisitingFiles = await fileDAO.find({
           path: `${path.join(seasonFolder, newName)}.${file.ext}`,
         });
+
+        const fileData: any = {
+          tvEpisodeId: episode.id,
+          path: `${path.join(seasonFolder, newName)}.${file.ext}`,
+        };
+
+        if (exisitingFiles.length > 0) {
+          fileData.id = exisitingFiles[0].id;
+        }
+
+        await fileDAO.save(fileData);
       }
     });
 

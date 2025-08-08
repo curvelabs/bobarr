@@ -21,8 +21,8 @@ services:
 
   postgres:
     ports:
-      - 5432:5432
+      - 54321:5432
 
   redis:
     ports:
-      - 6379:6379
+      - 63791:6379

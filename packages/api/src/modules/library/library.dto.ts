@@ -1,4 +1,4 @@
-import { ObjectType, Field, InputType } from '@nestjs/graphql';
+import { ObjectType, Field, InputType, Int } from '@nestjs/graphql';
 import BigInt from 'graphql-bigint';
 
 import { Movie } from 'src/entities/movie.entity';
@@ -57,6 +57,14 @@ export class JackettInput {
   @Field() public downloadLink!: string;
   @Field() public quality!: string;
   @Field() public tag!: string;
+}
+
+@InputType()
+export class MediaInfosInput {
+  @Field((_type) => Int) public movieTMDBId!: number;
+  @Field((_type) => Int) public tvShowTMDBId!: number;
+  @Field((_type) => Int) public seasonNumber!: number;
+  @Field((_type) => Int) public episodeNumber!: number;
 }
 
 @ObjectType()

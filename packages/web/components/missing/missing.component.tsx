@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
-import { Tag } from 'antd';
+import { notification, Tag } from 'antd';
 import { orderBy, uniqBy } from 'lodash';
 import { useRouter } from 'next/router';
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchOutlined, CheckOutlined } from '@ant-design/icons';
 
 import { formatNumber } from '../../utils/format-number';
 import { availableIn } from '../../utils/available-in';
 
 import {
   useGetMissingQuery,
+  useskipMissingEpisodeMutation,
   MissingTvEpisodesFragment,
   MissingMoviesFragment,
+  GetLibraryTvShowsDocument,
+  GetDownloadingDocument,
+  GetMissingDocument,
 } from '../../utils/graphql';
 
 import { ManualSearchComponent } from '../manual-search/manual-search.component';
@@ -27,6 +31,26 @@ export function MissingComponent() {
   const [manualSearch, setManualSearch] = useState<
     MissingTvEpisodesFragment | MissingMoviesFragment | null
   >(null);
+
+  const [skipMissingEpisode] = useskipMissingEpisodeMutation({
+    awaitRefetchQueries: true,
+    refetchQueries: [
+      { query: GetLibraryTvShowsDocument },
+      { query: GetDownloadingDocument },
+      { query: GetMissingDocument },
+    ],
+    onError: ({ message }) =>
+      notification.error({
+        message: message.replace('GraphQL error: ', ''),
+        placement: 'bottomRight',
+      }),
+    onCompleted: () => {
+      notification.success({
+        message: 'Media skiped',
+        placement: 'bottomRight',
+      });
+    },
+  });
 
   const isMovies = pathname.includes('movies');
   const rows: Array<MissingTvEpisodesFragment | MissingMoviesFragment> =
@@ -57,7 +81,11 @@ export function MissingComponent() {
         <MissingComponentStyles>
           <div className="wrapper">
             {missing.map((row) => (
-              <div key={row.id} className="row">
+              <div
+                key={row.id}
+                className="row"
+                style={{ justifyContent: 'space-between' }}
+              >
                 {/* missing movie */}
                 {row.__typename === 'EnrichedMovie' && (
                   <div>
@@ -77,12 +105,29 @@ export function MissingComponent() {
                   </div>
                 )}
 
-                <Tag
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => setManualSearch(row)}
-                >
-                  <SearchOutlined /> Missing
-                </Tag>
+                <div>
+                  <Tag
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => setManualSearch(row)}
+                  >
+                    <SearchOutlined /> Missing
+                  </Tag>
+
+                  {row.__typename === 'EnrichedTVEpisode' && (
+                    <Tag
+                      style={{ cursor: 'pointer' }}
+                      onClick={() =>
+                        skipMissingEpisode({
+                          variables: {
+                            mediaId: row.id,
+                          },
+                        })
+                      }
+                    >
+                      <CheckOutlined /> Skip
+                    </Tag>
+                  )}
+                </div>
               </div>
             ))}
 

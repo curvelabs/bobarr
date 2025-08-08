@@ -15,6 +15,7 @@ export enum JobName {
 export enum DownloadableMediaState {
   SEARCHING = 'searching',
   MISSING = 'missing',
+  SKIPPED = 'skipped',
   DOWNLOADING = 'downloading',
   DOWNLOADED = 'downloaded',
   PROCESSED = 'processed',

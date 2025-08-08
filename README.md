@@ -1,3 +1,19 @@
+# Fork specifics
+
+## Development
+
+```shell
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+```
+
+See `package.json` for specific commands.
+
+Below starts the original README.
+
+---
+
+
+
 # 🍿 Bobarr
 > The all-in-one alternative for Sonarr, Radarr, Jackett... with a VPN and running in docker
 

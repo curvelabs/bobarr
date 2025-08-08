@@ -141,7 +141,8 @@ export function TVSeasonDetailsComponent({
               setManualSearch({ ...season, tvShowTitle, tvShowTMDBId })
             }
           >
-            {season.inLibrary ? 'Replace' : 'Search'} season
+            {data?.episodes && data.episodes.length > 0 ? 'Replace' : 'Search'}{' '}
+            season
             <SearchOutlined style={{ marginLeft: 8 }} />
           </div>
         </div>

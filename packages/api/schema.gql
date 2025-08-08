@@ -32,6 +32,7 @@ type Movie {
 enum DownloadableMediaState {
   SEARCHING
   MISSING
+  SKIPPED
   DOWNLOADING
   DOWNLOADED
   PROCESSED
@@ -267,6 +268,7 @@ type Query {
   getGenres: TMDBGenresResults!
   searchJackett(query: String!): [JackettFormattedResult!]!
   getTorrentStatus(torrents: [GetTorrentStatusInput!]!): [TorrentStatus!]!
+  getMultiTorrentStatus(torrents: [GetTorrentStatusInput!]!): [TorrentStatus!]!
   getDownloadingMedias: [DownloadingMedia!]!
   getSearchingMedias: [SearchingMedia!]!
   getMovies: [EnrichedMovie!]!
@@ -293,6 +295,7 @@ type Mutation {
   startFindNewEpisodesJob: GraphQLCommonResponse!
   startDownloadMissingJob: GraphQLCommonResponse!
   downloadMovie(jackettResult: JackettInput!, movieId: Int!): GraphQLCommonResponse!
+  downloadMovieFromResult(jackettResult: JackettInput!, movieTMDBId: Int!): GraphQLCommonResponse!
   downloadSeason(jackettResult: JackettInput!, seasonNumber: Int!, tvShowTMDBId: Int!): GraphQLCommonResponse!
   downloadTVEpisode(jackettResult: JackettInput!, episodeId: Int!): GraphQLCommonResponse!
   trackMovie(tmdbId: Int!, title: String!): Movie!
@@ -300,7 +303,8 @@ type Mutation {
   trackTVShow(seasonNumbers: [Int!]!, tmdbId: Int!): TVShow!
   removeTVShow(tmdbId: Int!): GraphQLCommonResponse!
   resetLibrary(resetSettings: Boolean!, deleteFiles: Boolean!): GraphQLCommonResponse!
-  downloadOwnTorrent(torrent: String!, mediaType: FileType!, mediaId: Int!): GraphQLCommonResponse!
+  downloadOwnTorrent(mediaInfos: MediaInfosInput!, torrent: String!, mediaType: FileType!, mediaId: Int!): GraphQLCommonResponse!
+  skipMissingEpisode(mediaId: Int!): GraphQLCommonResponse!
 }
 
 input QualityInput {
@@ -323,4 +327,11 @@ input JackettInput {
   downloadLink: String!
   quality: String!
   tag: String!
+}
+
+input MediaInfosInput {
+  movieTMDBId: Int!
+  tvShowTMDBId: Int!
+  seasonNumber: Int!
+  episodeNumber: Int!
 }

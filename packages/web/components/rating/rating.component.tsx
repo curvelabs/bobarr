@@ -5,7 +5,7 @@ export function RatingComponent({ rating }: { rating: number }) {
   return (
     <RatingStyles className="vote--container" rating={rating}>
       <div className="vote" />
-      <div className="percent">{rating}%</div>
+      <div className="percent">{rating.toFixed(1)}%</div>
     </RatingStyles>
   );
 }

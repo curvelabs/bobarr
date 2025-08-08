@@ -37,6 +37,10 @@ export class TransmissionService {
       .then(({ torrents: [torrent] }) => torrent);
   }
 
+  public getTorrents(torrentHashes: string[]) {
+    return this.client.get(torrentHashes);
+  }
+
   @LazyTransaction()
   public async addTorrent(
     {
@@ -63,6 +67,20 @@ export class TransmissionService {
         : await this.client.addBase64(torrent);
 
     this.logger.info('torrent download started', torrentAttributes);
+
+    let existingTorrentEntity = await this.torrentDAO.findOne({
+      torrentHash: transmissionTorrent.hashString,
+    });
+
+    if (existingTorrentEntity) {
+      existingTorrentEntity = await torrentDAO.save({
+        ...existingTorrentEntity,
+        ...torrentAttributes,
+        torrentHash: transmissionTorrent.hashString,
+      });
+
+      return existingTorrentEntity;
+    }
 
     const torrentEntity = await torrentDAO.save({
       ...torrentAttributes,

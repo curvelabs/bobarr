@@ -180,6 +180,10 @@ export class ScanLibraryProcessor {
     { data: { movie } }: Job<{ movie: string }>,
     @TransactionManager() manager?: EntityManager
   ) {
+    if (movie.startsWith('.')) {
+      return;
+    }
+
     this.logger.info('processing movie', { movie });
 
     const movieDAO = manager!.getCustomRepository(MovieDAO);
@@ -203,10 +207,13 @@ export class ScanLibraryProcessor {
     const untrackedFiles = files.filter((file) => !file.match);
 
     if (movieInDatabase) {
-      this.logger.info('movie already tracked in library', { untrackedFiles });
+      this.logger.info('movie already tracked in library', {
+        movieId: movieInDatabase.match?.movie.id,
+        untrackedFiles,
+      });
 
       await forEachSeries(untrackedFiles, ({ file }) =>
-        fileDAO.save({ path: file, movieId: movieInDatabase.match?.id })
+        fileDAO.save({ path: file, movieId: movieInDatabase.match?.movie.id })
       );
 
       return;
@@ -215,7 +222,10 @@ export class ScanLibraryProcessor {
     const [, title, year] = /^(.+) \((\d+)/.exec(movie) || [];
 
     if (!title || !year) {
-      throw new Error(`cant parse movie name or year [${movie}]`);
+      this.logger.error('cant parse movie name or year', { movie });
+      // throw new Error(`cant parse movie name or year [${movie}]`);
+
+      return;
     }
 
     this.logger.info('parsed filename', { title, year });
@@ -389,7 +399,7 @@ export class ScanLibraryProcessor {
         return;
       }
 
-      const season = path.dirname(episodePath);
+      const season = path.basename(path.dirname(episodePath));
       const [seasonNumber] = /\d+/.exec(season) || [];
 
       if (!seasonNumber) {
@@ -397,11 +407,24 @@ export class ScanLibraryProcessor {
           season,
           seasonNumber,
         });
-        throw new Error('could not parse season number');
+        // throw new Error('could not parse season number');
+
+        return;
       }
 
       // parse episode number from title
-      const [, episodeNumber] = /E(\d+)/.exec(episodePath) || [];
+      const [, episodeNumber] =
+        /E(\d+)/.exec(path.basename(episodePath).toUpperCase()) || [];
+
+      if (!episodeNumber) {
+        this.logger.error('could not parse episode number', {
+          episode: path.basename(episodePath),
+          episodeNumber,
+        });
+        // throw new Error('could not parse season number');
+
+        return;
+      }
 
       this.logger.info(`found season number and episode`, {
         seasonNumber,

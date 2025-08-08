@@ -20,7 +20,7 @@ import { getImageURL } from '../../utils/get-cached-image-url';
 
 import { ManualSearchComponent } from '../manual-search/manual-search.component';
 
-import { useAddLibrary } from './use-add-library.hook';
+// import { useAddLibrary } from './use-add-library.hook';
 import { useRemoveLibrary } from './use-remove-library.hook';
 
 import { MovieDetailsStyles } from './movie-details.styles';
@@ -40,17 +40,20 @@ export function MovieDetailsComponent(props: MovieDetailsProps) {
   const [isSearchModalOpen, setSearchModalOpen] = useState(false);
 
   const { data } = useGetParamsQuery();
-  const handleAdd = useAddLibrary({ result: movie });
+  // const handleAdd = useAddLibrary({ result: movie });
   const handleRemove = useRemoveLibrary({ result: movie });
 
   const youtubeSearchURL = `//youtube.com/results?search_query=trailer+${movie.title}+${data?.params?.language}`;
 
   return (
     <>
-      {/* display replace ssearch modal only if we are in library pages */}
-      {isSearchModalOpen && movie.__typename === 'EnrichedMovie' && (
+      {isSearchModalOpen && (
         <ManualSearchComponent
-          media={movie}
+          media={{
+            ...movie,
+            movieTitle: movie.title,
+            movieTMDBId: movie.tmdbId,
+          }}
           onRequestClose={() => setSearchModalOpen(false)}
         />
       )}
@@ -111,7 +114,7 @@ export function MovieDetailsComponent(props: MovieDetailsProps) {
                 <div className="buttons">
                   {inLibrary ? (
                     <>
-                      {movie.__typename === 'EnrichedMovie' && (
+                      {
                         <div
                           className="btn"
                           onClick={() => setSearchModalOpen(true)}
@@ -119,14 +122,17 @@ export function MovieDetailsComponent(props: MovieDetailsProps) {
                           <FaRecycle />
                           <div>Replace</div>
                         </div>
-                      )}
+                      }
                       <div className="btn" onClick={handleRemove}>
                         <FaMinus />
                         <div>Remove from library</div>
                       </div>
                     </>
                   ) : (
-                    <div className="btn" onClick={handleAdd}>
+                    <div
+                      className="btn"
+                      onClick={() => setSearchModalOpen(true)}
+                    >
                       <FaPlus />
                       <div>Add to library</div>
                     </div>
